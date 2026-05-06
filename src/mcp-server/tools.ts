@@ -1,5 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import {
   BrandGuidelines,
   Image,
@@ -11,6 +12,9 @@ import {
   ValidationResult,
   PresentationResult,
 } from './types';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Mock symbols data (since assets/symbols is empty)
 const mockSymbols: Symbol[] = [
@@ -201,7 +205,9 @@ export async function generate_presentation(slide_plan: SlidePlan): Promise<Pres
     // Generate a unique filename for the presentation
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
     const filename = `presentation_${timestamp}.pptx`;
-    const outputPath = path.resolve(__dirname, '../../output', filename);
+    const outputDir = path.resolve(__dirname, '../../output');
+    await fs.mkdir(outputDir, { recursive: true });
+    const outputPath = path.join(outputDir, filename);
     
     // Mock presentation generation (in a real implementation, this would create an actual PPTX file)
     // For now, we'll create a JSON representation of the presentation

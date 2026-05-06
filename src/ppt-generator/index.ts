@@ -220,7 +220,7 @@ async function createDemoPresentation(): Promise<void> {
     console.log(`💾 Saving presentation to: ${outputDir}`);
 
     // Use the library's writeFile method
-    await pptx.writeFile({ fileName: "demo.pptx" });
+    await pptx.writeFile({ fileName: path.join(outputDir, "demo.pptx") });
 
     console.log("✅ Presentation created successfully!");
     console.log(`📄 File saved as: output/demo.pptx`);
