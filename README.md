@@ -1,177 +1,161 @@
 # WWF Presentation Generator
 
-A Model Context Protocol (MCP) based tool for generating WWF-style presentations from topic prompts.
+A TypeScript proof of concept for generating WWF-style PowerPoint presentations from topic prompts. It includes a web UI, mock MCP-style tools, mock brand data, and OpenRouter-backed prompt generation.
 
-## Goal
+## What It Does
 
-Generate a WWF-style presentation from a topic prompt.
+- Generates WWF-style presentation slide plans and PPTX files
+- Uses mock brand guidelines, image metadata, partner logos, and policy guidance
+- Saves generated files locally under `output/`
+- Provides a web server for creating, listing, downloading, regenerating, and deleting slide plans
+- Includes MCP-style tool functions for brand lookup, image lookup, partner lookup, validation, and presentation generation
 
-## MVP (Minimum Viable Product)
+## Repository Notes
 
-- Use mock brand guidelines
-- Use mock image repository
-- Use mock partner logo repository
-- Generate 5-slide PowerPoint
-- Add photo credits
-- Run compliance validation
+This repo intentionally does not track local/generated files:
 
-## Out of Scope
+- `node_modules/` is ignored. Run `npm install` after cloning.
+- `.env` is ignored. Copy `.env.example` to `.env` and add your own OpenRouter API key.
+- `output/` is ignored and created automatically when presentations are generated.
+- Generated `presentation-*.pptx` files are ignored.
+- `dist/` is ignored in `.gitignore`, but the current repo may include built files already. Source files live under `src/`.
 
-- Real WWF internal systems
-- Real authentication
-- Full brand guideline coverage
+## Prerequisites
+
+- Node.js 18+
+- npm
+- An OpenRouter API key if you want AI-generated presentation content
+
+## Setup
+
+```bash
+git clone https://github.com/Joe2010x/wwf-presentation-poc.git
+cd wwf-presentation-poc
+npm install
+copy .env.example .env
+npm run build
+```
+
+On macOS/Linux, use:
+
+```bash
+cp .env.example .env
+```
+
+Then edit `.env` and set:
+
+```env
+OPENROUTER_API_KEY=your_openrouter_api_key_here
+```
+
+## Run The Web App
+
+```bash
+npm run dev
+```
+
+This builds the TypeScript project and starts the web server. By default, the app runs at:
+
+```text
+http://localhost:3000
+```
+
+Generated files are written to:
+
+```text
+output/pptx/
+output/slide-plans/
+```
+
+These folders are created automatically if they do not exist.
+
+## CLI Usage
+
+Build first:
+
+```bash
+npm run build
+```
+
+Then generate a presentation from command-line arguments:
+
+```bash
+npm start -- --title="Ocean Pollution Crisis" --subtitle="Protecting Our Seas" --slides='[{"type":"title","data":{"title":"Ocean Pollution Crisis","subtitle":"Protecting Our Seas"}}]' --output="ocean-pollution.pptx"
+```
+
+The generated PPTX will be saved under `output/pptx/`.
+
+## Scripts
+
+| Command | Description |
+| --- | --- |
+| `npm install` | Install local dependencies into ignored `node_modules/` |
+| `npm run build` | Compile TypeScript into `dist/` |
+| `npm start` | Run the CLI presentation generator from `dist/` |
+| `npm run server` | Start the compiled web server |
+| `npm run dev` | Build, then start the web server |
 
 ## Project Structure
 
-```
+```text
 wwf-presentation-poc/
-├── assets/
-│   ├── images/          # Mock image repository
-│   ├── logos/           # Partner logo repository
-│   └── symbols/         # WWF symbols and icons
-├── data/
-│   ├── brand-guidelines.json    # Mock brand guidelines
-│   ├── image-repository.json    # Mock image metadata
-│   ├── partner-logos.json       # Partner logo metadata
-│   └── policy-guidelines.md     # Content and compliance policies
-├── docs/
-│   └── mcp-tools-design.md      # MCP tools API documentation
-├── mock-responses/               # Mock API response examples
-│   ├── search_images_response.json
-│   ├── get_image_metadata_response.json
-│   ├── search_symbols_response.json
-│   ├── get_partner_logo_response.json
-│   ├── generate_presentation_response.json
-│   ├── validate_presentation_response.json
-│   └── validate_presentation_failure_response.json
-├── src/
-│   ├── mcp-server/
-│   │   ├── types.ts              # Shared TypeScript interfaces
-│   │   └── tools.ts              # MCP tool implementations
-│   ├── ppt-generator/
-│   │   └── brand-loader.ts       # Brand guidelines loader
-│   └── validator/                # Compliance validation (placeholder)
-├── output/                       # Generated presentations
-├── package.json
-├── tsconfig.json
-└── README.md
+|-- assets/
+|   |-- images/
+|   |-- logos/
+|   `-- symbols/
+|-- data/
+|   |-- brand-guidelines.json
+|   |-- image-repository.json
+|   |-- partner-logos.json
+|   `-- policy-guidelines.md
+|-- docs/
+|   `-- mcp-tools-design.md
+|-- mock-responses/
+|-- public/
+|-- src/
+|   |-- llm/
+|   |-- mcp-server/
+|   |-- ppt-generator/
+|   |-- validator/
+|   `-- web-server/
+|-- .env.example
+|-- .gitignore
+|-- package.json
+|-- package-lock.json
+|-- tsconfig.json
+`-- README.md
 ```
 
-## Getting Started
+## MCP-Style Tools
 
-### Prerequisites
-
-- Node.js 18+
-- npm or yarn
-
-### Installation
-
-```bash
-cd wwf-presentation-poc
-npm install
-npm run build
-```
-
-### Usage
-
-1. Place images in `assets/images/`
-2. Place partner logos in `assets/logos/`
-3. Update data files in `data/` as needed
-4. Import and use the MCP tools from `src/mcp-server/tools.ts`
-5. Generated presentations will be saved to `output/`
-
-## MCP Tools
-
-The project provides 7 MCP tools for presentation generation:
+The project includes tool functions in `src/mcp-server/tools.ts`:
 
 | Tool | Description |
-|------|-------------|
-| `get_brand_guidelines()` | Load WWF brand guidelines (colors, fonts, templates) |
-| `search_images(query)` | Search image repository by tags, category, or description |
-| `get_image_metadata(image_id)` | Get detailed metadata for a specific image |
-| `search_symbols(keyword)` | Search WWF symbols/icons by keyword |
-| `get_partner_logo(partner_name)` | Get partner logo information by organization name |
-| `generate_presentation(slide_plan)` | Generate a 5-slide presentation |
-| `validate_presentation(slide_plan)` | Validate presentation against brand guidelines |
+| --- | --- |
+| `get_brand_guidelines()` | Load mock WWF brand guidelines |
+| `search_images(query)` | Search image metadata by tag, category, or description |
+| `get_image_metadata(image_id)` | Get metadata for a specific image |
+| `search_symbols(keyword)` | Search mock WWF symbols/icons |
+| `get_partner_logo(partner_name)` | Get partner logo metadata |
+| `generate_presentation(slide_plan)` | Generate a mock 5-slide presentation JSON |
+| `validate_presentation(slide_plan)` | Validate a slide plan against guidelines |
 
-### Example Usage
+## Development Hygiene
 
-```typescript
-import {
-  get_brand_guidelines,
-  search_images,
-  get_image_metadata,
-  search_symbols,
-  get_partner_logo,
-  generate_presentation,
-  validate_presentation
-} from './mcp-server/tools';
-
-// Get brand guidelines
-const guidelines = await get_brand_guidelines();
-console.log(`WWF Brand Guidelines v${guidelines.version}`);
-
-// Search for images
-const images = await search_images('plastic pollution');
-console.log(`Found ${images.length} images`);
-
-// Get image metadata
-const image = await get_image_metadata('img_001');
-console.log(`Image: ${image.title} by ${image.photographer}`);
-
-// Search symbols
-const symbols = await search_symbols('panda');
-console.log(`Found ${symbols.length} symbols`);
-
-// Get partner logo
-const partner = await get_partner_logo('Global Conservation Fund');
-console.log(`Partner: ${partner.name} (${partner.partnershipLevel})`);
-
-// Validate and generate presentation
-const slidePlan = {
-  title: 'Ocean Conservation',
-  slides: [
-    { slideNumber: 1, slideType: 'title', title: 'Ocean Conservation' },
-    { slideNumber: 2, slideType: 'content', title: 'The Problem', content: '...' },
-    { slideNumber: 3, slideType: 'image', title: 'Impact', imageId: 'img_001' },
-    { slideNumber: 4, slideType: 'content', title: 'Solution', content: '...' },
-    { slideNumber: 5, slideType: 'partners', title: 'Partners', partnerLogos: ['Partner Name'] }
-  ]
-};
-
-const validation = await validate_presentation(slidePlan);
-if (validation.isValid) {
-  const result = await generate_presentation(slidePlan);
-  console.log(result.message);
-} else {
-  console.error('Validation failed:', validation.issues);
-}
-```
-
-## Data Files
-
-- **brand-guidelines.json**: Defines colors, fonts, logo usage rules, and slide templates
-- **image-repository.json**: Catalog of available images with metadata (id, tags, photographer, license)
-- **partner-logos.json**: Partner organization information and logo paths
-- **policy-guidelines.md**: Content standards and compliance requirements
-
-## Documentation
-
-- **[MCP Tools Design](docs/mcp-tools-design.md)**: Complete API documentation with input/output specifications and examples
-
-## Mock Responses
-
-The `mock-responses/` directory contains example JSON responses for each MCP tool, useful for testing and understanding the expected output format.
-
-## Development
+Before committing, check what Git will include:
 
 ```bash
-# Build TypeScript
-npm run build
-
-# Watch mode
-npm run build -- --watch
+git status --short --ignored
+git ls-files node_modules
 ```
+
+`git ls-files node_modules` should print nothing. If it prints files, remove them from tracking with:
+
+```bash
+git rm --cached -r node_modules
+```
+
+Do not commit `.env` or generated output files. Use `.env.example` for shared configuration placeholders.
 
 ## License
 
