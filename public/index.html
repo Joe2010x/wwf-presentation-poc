@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WWF Presentation Generator</title>
+    <style>
+        :root {
+            --primary: #000000;
+            --secondary: #FFFFFF;
+            --accent: #FFD700;
+            --text-primary: #1A1A1A;
+            --text-secondary: #666666;
+            --bg-light: #f5f5f5;
+            --border: #e0e0e0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: var(--bg-light);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: var(--primary);
+            color: var(--secondary);
+            padding: 30px 0;
+            margin-bottom: 30px;
+            border-bottom: 4px solid var(--accent);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        header p {
+            text-align: center;
+            margin-top: 10px;
+            color: #ccc;
+            font-size: 1.1rem;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .form-section {
+            background: var(--secondary);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .form-section h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--accent);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        input[type="text"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            background: var(--primary);
+            color: var(--secondary);
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #333;
+        }
+
+        button.accent {
+            background: var(--accent);
+            color: var(--primary);
+        }
+
+        button.accent:hover {
+            background: #e6c200;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .slides-container {
+            margin-top: 20px;
+        }
+
+        .slide-item {
+            background: var(--bg-light);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            border-left: 4px solid var(--accent);
+            position: relative;
+        }
+
+        .slide-item .remove-slide {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide-type-badge {
+            display: inline-block;
+            background: var(--primary);
+            color: var(--secondary);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .preview-section {
+            background: var(--secondary);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .preview-section h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--accent);
+        }
+
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .template-card {
+            background: var(--bg-light);
+            padding: 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .template-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-color: var(--accent);
+        }
+
+        .template-card h3 {
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .template-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .status-message {
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            display: none;
+        }
+
+        .status-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .status-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        .status-message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+            display: block;
+        }
+
+        .download-link {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background: var(--accent);
+            color: var(--primary);
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .download-link:hover {
+            background: #e6c200;
+        }
+
+        .prompt-section {
+            background: var(--bg-light);
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid var(--accent);
+            margin-bottom: 20px;
+        }
+
+        .prompt-section textarea {
+            min-height: 120px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border);
+            margin-top: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>🐼 WWF Presentation Generator</h1>
+            <p>Create beautiful, brand-compliant presentations in seconds</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="main-content">
+            <div class="form-section">
+                <h2>Create Your Presentation</h2>
+
+                <div class="prompt-section">
+                    <div class="form-group">
+                        <label for="llm-prompt">Generate with AI Prompt</label>
+                        <textarea id="llm-prompt" placeholder="Example: Create a 6-slide WWF-style presentation about ocean plastic pollution for high school students"></textarea>
+                    </div>
+                    <button type="button" class="accent" id="generate-ai-btn">Generate from Prompt</button>
+                </div>
+                
+                <form id="presentation-form">
+                    <div class="form-group">
+                        <label for="title">Presentation Title *</label>
+                        <input type="text" id="title" name="title" required placeholder="Enter presentation title">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subtitle">Subtitle</label>
+                        <input type="text" id="subtitle" name="subtitle" placeholder="Enter subtitle (optional)">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Slides</label>
+                        <div class="slides-container" id="slides-container">
+                            <!-- Slides will be added here dynamically -->
+                        </div>
+
+                        <div class="btn-group">
+                            <button type="button" class="accent" onclick="addSlide('title')">+ Title Slide</button>
+                            <button type="button" class="accent" onclick="addSlide('content')">+ Content Slide</button>
+                            <button type="button" class="accent" onclick="addSlide('image')">+ Image Slide</button>
+                            <button type="button" class="accent" onclick="addSlide('closing')">+ Closing Slide</button>
+                        </div>
+                    </div>
+
+                    <div class="btn-group" style="margin-top: 20px;">
+                        <button type="submit">🚀 Generate Presentation</button>
+                        <button type="button" onclick="loadTemplates()">📋 Load Templates</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="preview-section">
+                <h2>Templates & Preview</h2>
+                
+                <div id="status-message" class="status-message"></div>
+
+                <div id="templates-container" class="template-grid">
+                    <!-- Templates will be loaded here -->
+                </div>
+
+                <div id="download-section" style="display: none;">
+                    <h3>✅ Presentation Generated!</h3>
+                    <a id="download-link" class="download-link" href="#">⬇️ Download PPTX</a>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <h3>Instructions</h3>
+                    <ol style="margin-left: 20px; line-height: 2;">
+                        <li>Add a title for your presentation</li>
+                        <li>Click the buttons to add different slide types</li>
+                        <li>Fill in the content for each slide</li>
+                        <li>Click "Generate Presentation" to create your PPTX</li>
+                        <li>Download the generated file</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>WWF Presentation Generator | Built with TypeScript & pptxgenjs</p>
+        </div>
+    </footer>
+
+    <script>
+        let slideCounter = 0;
+        let templates = [];
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTemplates();
+            
+            document.getElementById('presentation-form').addEventListener('submit', handleSubmit);
+            document.getElementById('generate-ai-btn').addEventListener('click', handlePromptGenerate);
+        });
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        // Load available templates
+        async function loadTemplates() {
+            try {
+                const response = await fetch('/api/templates');
+                templates = await response.json();
+                
+                const container = document.getElementById('templates-container');
+                container.innerHTML = '';
+
+                templates.forEach(template => {
+                    const card = document.createElement('div');
+                    card.className = 'template-card';
+                    card.innerHTML = `
+                        <h3>${template.name}</h3>
+                        <p>${template.description}</p>
+                    `;
+                    card.addEventListener('click', () => loadTemplate(template));
+                    container.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Error loading templates:', error);
+            }
+        }
+
+        // Load a template into the form
+        function loadTemplate(template) {
+            loadPresentationConfig(template.config);
+            showStatus('Template loaded! Customize and generate your presentation.', 'info');
+        }
+
+        function loadPresentationConfig(config) {
+            document.getElementById('title').value = config.title || '';
+            document.getElementById('subtitle').value = config.subtitle || '';
+
+            const container = document.getElementById('slides-container');
+            container.innerHTML = '';
+
+            (config.slides || []).forEach(slide => {
+                addSlide(slide.type, slide.data);
+            });
+        }
+
+        // Add a new slide
+        function addSlide(type, data = null) {
+            slideCounter++;
+            const slideId = slideCounter;
+            
+            const container = document.getElementById('slides-container');
+            const slideDiv = document.createElement('div');
+            slideDiv.className = 'slide-item';
+            slideDiv.id = `slide-${slideId}`;
+            
+            let contentHtml = '';
+            
+            switch(type) {
+                case 'title':
+                    contentHtml = `
+                        <div class="form-group">
+                            <label>Title *</label>
+                            <input type="text" name="slide-${slideId}-title" value="${escapeHtml(data?.title)}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Subtitle</label>
+                            <input type="text" name="slide-${slideId}-subtitle" value="${escapeHtml(data?.subtitle)}">
+                        </div>
+                    `;
+                    break;
+                case 'content':
+                    contentHtml = `
+                        <div class="form-group">
+                            <label>Headline *</label>
+                            <input type="text" name="slide-${slideId}-headline" value="${escapeHtml(data?.headline)}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Bullet Points (one per line) *</label>
+                            <textarea name="slide-${slideId}-bullets" required>${escapeHtml(data?.bullets?.join('\n'))}</textarea>
+                        </div>
+                    `;
+                    break;
+                case 'image':
+                    contentHtml = `
+                        <div class="form-group">
+                            <label>Attribution *</label>
+                            <input type="text" name="slide-${slideId}-attribution" value="${escapeHtml(data?.attribution || 'Image credit')}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Caption</label>
+                            <input type="text" name="slide-${slideId}-caption" value="${escapeHtml(data?.caption)}">
+                        </div>
+                    `;
+                    break;
+                case 'closing':
+                    contentHtml = `
+                        <div class="form-group">
+                            <label>Message *</label>
+                            <input type="text" name="slide-${slideId}-message" value="${escapeHtml(data?.message || 'Thank You')}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Subtitle</label>
+                            <input type="text" name="slide-${slideId}-subtitle" value="${escapeHtml(data?.subtitle)}">
+                        </div>
+                    `;
+                    break;
+            }
+            
+            slideDiv.innerHTML = `
+                <span class="slide-type-badge">${type}</span>
+                <button type="button" class="remove-slide" onclick="removeSlide(${slideId})">×</button>
+                ${contentHtml}
+            `;
+            
+            container.appendChild(slideDiv);
+        }
+
+        // Remove a slide
+        function removeSlide(slideId) {
+            const slide = document.getElementById(`slide-${slideId}`);
+            if (slide) {
+                slide.remove();
+            }
+        }
+
+        async function handlePromptGenerate() {
+            const prompt = document.getElementById('llm-prompt').value.trim();
+
+            if (!prompt) {
+                showStatus('Please enter a prompt for the AI generator.', 'error');
+                return;
+            }
+
+            const button = document.getElementById('generate-ai-btn');
+            button.disabled = true;
+            button.textContent = 'Generating...';
+
+            try {
+                showStatus('Generating slide plan with AI...', 'info');
+
+                const response = await fetch('/api/generate-from-prompt', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ prompt })
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    loadPresentationConfig(result.presentation);
+                    showStatus(`✅ ${result.message}`, 'success');
+
+                    const downloadSection = document.getElementById('download-section');
+                    const downloadLink = document.getElementById('download-link');
+                    downloadLink.href = result.downloadUrl;
+                    downloadSection.style.display = 'block';
+                } else {
+                    showStatus(`❌ ${result.message || result.error || 'AI generation failed'}`, 'error');
+                }
+            } catch (error) {
+                showStatus(`❌ Error: ${error.message}`, 'error');
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Generate from Prompt';
+            }
+        }
+
+        // Handle form submission
+        async function handleSubmit(e) {
+            e.preventDefault();
+            
+            const title = document.getElementById('title').value;
+            const subtitle = document.getElementById('subtitle').value;
+            
+            // Collect slides
+            const slides = [];
+            const slideElements = document.querySelectorAll('.slide-item');
+            
+            slideElements.forEach(slideEl => {
+                const badge = slideEl.querySelector('.slide-type-badge');
+                const type = badge.textContent.toLowerCase();
+                
+                let slideData = {};
+                
+                switch(type) {
+                    case 'title':
+                        slideData = {
+                            title: slideEl.querySelector(`[name*="-title"]`).value,
+                            subtitle: slideEl.querySelector(`[name*="-subtitle"]`).value
+                        };
+                        break;
+                    case 'content':
+                        slideData = {
+                            headline: slideEl.querySelector(`[name*="-headline"]`).value,
+                            bullets: slideEl.querySelector(`[name*="-bullets"]`).value.split('\n').filter(b => b.trim())
+                        };
+                        break;
+                    case 'image':
+                        slideData = {
+                            attribution: slideEl.querySelector(`[name*="-attribution"]`).value,
+                            caption: slideEl.querySelector(`[name*="-caption"]`)?.value
+                        };
+                        break;
+                    case 'closing':
+                        slideData = {
+                            message: slideEl.querySelector(`[name*="-message"]`).value,
+                            subtitle: slideEl.querySelector(`[name*="-subtitle"]`)?.value
+                        };
+                        break;
+                }
+                
+                slides.push({ type, data: slideData });
+            });
+            
+            if (slides.length === 0) {
+                showStatus('Please add at least one slide!', 'error');
+                return;
+            }
+            
+            // Create presentation config
+            const config = {
+                title,
+                subtitle: subtitle || undefined,
+                slides
+            };
+            
+            // Send to server
+            try {
+                showStatus('Generating presentation...', 'info');
+                
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(config)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    showStatus(`✅ ${result.message}`, 'success');
+                    
+                    const downloadSection = document.getElementById('download-section');
+                    const downloadLink = document.getElementById('download-link');
+                    downloadLink.href = result.downloadUrl;
+                    downloadSection.style.display = 'block';
+                } else {
+                    showStatus(`❌ ${result.error || 'Generation failed'}`, 'error');
+                }
+            } catch (error) {
+                showStatus(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Show status message
+        function showStatus(message, type) {
+            const statusEl = document.getElementById('status-message');
+            statusEl.textContent = message;
+            statusEl.className = `status-message ${type}`;
+            
+            // Auto-hide after 5 seconds for non-error messages
+            if (type !== 'error') {
+                setTimeout(() => {
+                    statusEl.style.display = 'none';
+                }, 5000);
+            }
+        }
+    </script>
+</body>
+</html>

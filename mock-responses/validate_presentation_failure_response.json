@@ -1,0 +1,10 @@
+{
+  "isValid": false,
+  "issues": [
+    "Expected 5 slides, but found 3.",
+    "Presentation title is required."
+  ],
+  "warnings": [
+    "Slide 2: Photo credits should be included when using images."
+  ]
+}

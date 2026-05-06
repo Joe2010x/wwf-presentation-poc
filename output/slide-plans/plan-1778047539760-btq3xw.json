@@ -1,0 +1,76 @@
+{
+  "id": "plan-1778047539760-btq3xw",
+  "title": "Nordic Climate Changes",
+  "subtitle": "Understanding the Impact and Future Projections",
+  "createdAt": "2026-05-06T06:05:39.760Z",
+  "slides": [
+    {
+      "type": "title",
+      "content": {
+        "title": "Nordic Climate Changes",
+        "subtitle": "Understanding the Impact and Future Projections"
+      },
+      "order": 1
+    },
+    {
+      "type": "content",
+      "content": {
+        "headline": "Overview of Nordic Climate",
+        "bullets": [
+          "Unique geographical features",
+          "Vast natural resources",
+          "Diverse ecosystems",
+          "Influence of Arctic conditions"
+        ]
+      },
+      "order": 2
+    },
+    {
+      "type": "content",
+      "content": {
+        "headline": "Current Climate Trends",
+        "bullets": [
+          "Rising temperatures observed",
+          "Increased precipitation patterns",
+          "Melting glaciers and ice caps",
+          "Shifts in wildlife habitats"
+        ]
+      },
+      "order": 3
+    },
+    {
+      "type": "image",
+      "content": {
+        "attribution": "Photo by John Doe on Unsplash",
+        "caption": "Melting glaciers in the Nordic region"
+      },
+      "order": 4
+    },
+    {
+      "type": "content",
+      "content": {
+        "headline": "Future Projections",
+        "bullets": [
+          "Continued temperature rise expected",
+          "Increased frequency of extreme weather",
+          "Potential for biodiversity loss",
+          "Impact on local economies and communities"
+        ]
+      },
+      "order": 5
+    },
+    {
+      "type": "closing",
+      "content": {
+        "message": "Addressing Climate Change Together",
+        "subtitle": "Collaborative efforts for a sustainable future"
+      },
+      "order": 6
+    }
+  ],
+  "metadata": {
+    "author": "WWF Presentation Generator",
+    "company": "World Wildlife Fund",
+    "totalSlides": 6
+  }
+}

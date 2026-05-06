@@ -1,0 +1,22 @@
+◇ injected env (4) from .env // tip: ◈ encrypted .env [www.dotenvx.com]
+🚀 WWF Presentation Generator Web Server
+📡 Server running at: http://localhost:3000
+📝 API endpoint: http://localhost:3000/api/generate
+🎨 Web interface: http://localhost:3000
+📂 Output directory: C:\Users\dps_s\source\repos\AIProjects\ClineProject\WWFtest1\wwf-presentation-poc\output
+🤖 Sending request to OpenRouter API...
+📝 Received response from OpenRouter
+✅ Generated presentation with 6 slides
+🎬 Creating presentation: "Ocean Pollution: A Growing Concern"...
+📋 Creating slide plan...
+📋 Slide plan saved: C:\Users\dps_s\source\repos\AIProjects\ClineProject\WWFtest1\wwf-presentation-poc\output\slide-plans\plan-1777992212203-6vw94v.json
+📝 Adding slide 1: title
+📝 Adding slide 2: content
+📝 Adding slide 3: content
+📝 Adding slide 4: image
+📝 Adding slide 5: content
+📝 Adding slide 6: closing
+💾 Saving presentation to: C:\Users\dps_s\source\repos\AIProjects\ClineProject\WWFtest1\wwf-presentation-poc\output\pptx\presentation-1777992212202.pptx
+✅ Presentation created successfully!
+📄 File saved as: output/presentation-1777992212202.pptx
+📋 Slide plan saved as: output/slide-plans/plan-1777992212203-6vw94v.json

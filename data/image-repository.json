@@ -1,0 +1,63 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-05-05",
+  "images": [
+    {
+      "id": "img_001",
+      "filename": "panda_bamboo.jpg",
+      "category": "wildlife",
+      "tags": ["panda", "bamboo", "endangered", "china"],
+      "description": "Giant panda eating bamboo in natural habitat",
+      "photographer": "John Smith",
+      "license": "WWF Internal Use",
+      "resolution": "1920x1080",
+      "path": "assets/images/panda_bamboo.jpg"
+    },
+    {
+      "id": "img_002",
+      "filename": "tiger_forest.jpg",
+      "category": "wildlife",
+      "tags": ["tiger", "forest", "endangered", "asia"],
+      "description": "Bengal tiger in tropical forest",
+      "photographer": "Maria Garcia",
+      "license": "WWF Internal Use",
+      "resolution": "1920x1080",
+      "path": "assets/images/tiger_forest.jpg"
+    },
+    {
+      "id": "img_003",
+      "filename": "ocean_plastic.jpg",
+      "category": "environment",
+      "tags": ["ocean", "pollution", "plastic", "conservation"],
+      "description": "Ocean pollution highlighting plastic waste impact",
+      "photographer": "David Chen",
+      "license": "WWF Internal Use",
+      "resolution": "1920x1080",
+      "path": "assets/images/ocean_plastic.jpg"
+    },
+    {
+      "id": "img_004",
+      "filename": "rainforest_canopy.jpg",
+      "category": "environment",
+      "tags": ["rainforest", "trees", "biodiversity", "amazon"],
+      "description": "Aerial view of rainforest canopy",
+      "photographer": "Sarah Johnson",
+      "license": "WWF Internal Use",
+      "resolution": "1920x1080",
+      "path": "assets/images/rainforest_canopy.jpg"
+    },
+    {
+      "id": "img_005",
+      "filename": "polar_bear_ice.jpg",
+      "category": "wildlife",
+      "tags": ["polar bear", "arctic", "climate change", "ice"],
+      "description": "Polar bear on melting ice cap",
+      "photographer": "Michael Brown",
+      "license": "WWF Internal Use",
+      "resolution": "1920x1080",
+      "path": "assets/images/polar_bear_ice.jpg"
+    }
+  ],
+  "categories": ["wildlife", "environment", "conservation", "climate"],
+  "totalImages": 5
+}

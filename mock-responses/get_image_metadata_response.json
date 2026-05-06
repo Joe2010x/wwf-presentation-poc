@@ -1,0 +1,13 @@
+{
+  "id": "img_001",
+  "title": "Giant panda eating bamboo in natural habitat",
+  "path": "assets/images/panda_bamboo.jpg",
+  "photographer": "John Smith",
+  "copyright": "© WWF / John Smith",
+  "approved": true,
+  "license": "WWF Internal Use",
+  "resolution": "1920x1080",
+  "category": "wildlife",
+  "tags": ["panda", "bamboo", "endangered", "china"],
+  "description": "Giant panda eating bamboo in natural habitat"
+}

@@ -1,0 +1,38 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-05-05",
+  "colors": {
+    "primary": "#000000",
+    "secondary": "#FFFFFF",
+    "accent": "#FFD700",
+    "textPrimary": "#1A1A1A",
+    "textSecondary": "#666666"
+  },
+  "fonts": {
+    "heading": "Arial Black",
+    "subheading": "Arial Bold",
+    "body": "Arial",
+    "caption": "Arial Narrow"
+  },
+  "logoUsage": {
+    "minClearSpace": "20px",
+    "minWidth": "100px",
+    "placement": ["top-left", "bottom-right"]
+  },
+  "slideTemplates": {
+    "titleSlide": {
+      "background": "#FFFFFF",
+      "logoPosition": "top-left",
+      "titlePosition": "center"
+    },
+    "contentSlide": {
+      "background": "#FFFFFF",
+      "headerHeight": "60px",
+      "footerHeight": "40px"
+    },
+    "imageSlide": {
+      "background": "#000000",
+      "imageOverlay": "rgba(0,0,0,0.3)"
+    }
+  }
+}

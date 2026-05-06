@@ -1,0 +1,35 @@
+{
+  "name": "wwf-presentation-poc",
+  "version": "1.0.0",
+  "description": "WWF-style presentation generator",
+  "main": "src/ppt-generator/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/ppt-generator/index.js",
+    "server": "node dist/web-server/server.js",
+    "dev": "npm run build && npm run server"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/dotenv": "^6.1.1",
+    "@types/express": "^5.0.6",
+    "@types/multer": "^2.1.0",
+    "@types/node": "^20.19.39",
+    "typescript": "^5.0.0"
+  },
+  "keywords": [
+    "wwf",
+    "presentation",
+    "powerpoint"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "multer": "^2.1.1",
+    "pptxgenjs": "^4.0.1"
+  }
+}

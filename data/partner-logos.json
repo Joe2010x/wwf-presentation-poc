@@ -1,0 +1,54 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-05-05",
+  "partners": [
+    {
+      "id": "partner_001",
+      "name": "Global Conservation Fund",
+      "logoFile": "gcf_logo.png",
+      "path": "assets/logos/gcf_logo.png",
+      "partnershipLevel": "platinum",
+      "website": "https://www.gcf-example.org",
+      "active": true
+    },
+    {
+      "id": "partner_002",
+      "name": "Wildlife Protection Alliance",
+      "logoFile": "wpa_logo.png",
+      "path": "assets/logos/wpa_logo.png",
+      "partnershipLevel": "gold",
+      "website": "https://www.wpa-example.org",
+      "active": true
+    },
+    {
+      "id": "partner_003",
+      "name": "Ocean Conservancy International",
+      "logoFile": "oci_logo.png",
+      "path": "assets/logos/oci_logo.png",
+      "partnershipLevel": "gold",
+      "website": "https://www.oci-example.org",
+      "active": true
+    },
+    {
+      "id": "partner_004",
+      "name": "Sustainable Future Foundation",
+      "logoFile": "sff_logo.png",
+      "path": "assets/logos/sff_logo.png",
+      "partnershipLevel": "silver",
+      "website": "https://www.sff-example.org",
+      "active": true
+    },
+    {
+      "id": "partner_005",
+      "name": "Climate Action Network",
+      "logoFile": "can_logo.png",
+      "path": "assets/logos/can_logo.png",
+      "partnershipLevel": "silver",
+      "website": "https://www.can-example.org",
+      "active": false
+    }
+  ],
+  "partnershipLevels": ["platinum", "gold", "silver", "bronze"],
+  "totalPartners": 5,
+  "activePartners": 4
+}

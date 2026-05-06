@@ -1,0 +1,8 @@
+{
+  "id": "partner_001",
+  "name": "Global Conservation Fund",
+  "logoPath": "assets/logos/gcf_logo.png",
+  "partnershipLevel": "platinum",
+  "website": "https://www.gcf-example.org",
+  "active": true
+}

@@ -1,0 +1,10 @@
+[
+  {
+    "id": "sym_001",
+    "name": "WWF Panda",
+    "title": "The iconic WWF panda logo symbol",
+    "path": "assets/symbols/panda_symbol.svg",
+    "tags": ["panda", "logo", "wwf", "icon"],
+    "description": "The iconic WWF panda logo symbol"
+  }
+]

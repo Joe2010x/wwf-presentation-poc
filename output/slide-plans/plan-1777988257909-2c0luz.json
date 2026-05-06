@@ -1,0 +1,51 @@
+{
+  "id": "plan-1777988257909-2c0luz",
+  "title": "Wildlife Conservation",
+  "subtitle": "Protecting Endangered Species",
+  "createdAt": "2026-05-05T13:37:37.909Z",
+  "slides": [
+    {
+      "type": "title",
+      "content": {
+        "title": "Wildlife Conservation",
+        "subtitle": "Protecting Endangered Species"
+      },
+      "order": 1
+    },
+    {
+      "type": "content",
+      "content": {
+        "headline": "Species at Risk",
+        "bullets": [
+          "Over 41,000 species threatened with extinction",
+          "Wildlife populations declined 69% since 1970",
+          "Habitat loss is the primary threat",
+          "Climate change exacerbating the crisis",
+          "Poaching and illegal trade continue"
+        ]
+      },
+      "order": 2
+    },
+    {
+      "type": "image",
+      "content": {
+        "attribution": "Photo: WWF Conservation",
+        "caption": "Endangered species need our protection"
+      },
+      "order": 3
+    },
+    {
+      "type": "closing",
+      "content": {
+        "message": "Save Wildlife, Save Our Planet",
+        "subtitle": "Every Species Matters"
+      },
+      "order": 4
+    }
+  ],
+  "metadata": {
+    "author": "WWF Presentation Generator",
+    "company": "World Wildlife Fund",
+    "totalSlides": 4
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "id": "plan-1777990874173-oixcxy",
+  "title": "Ocean Pollution Crisis",
+  "subtitle": "Protecting Our Seas for Future Generations",
+  "createdAt": "2026-05-05T14:21:14.173Z",
+  "slides": [
+    {
+      "type": "title",
+      "content": {
+        "title": "Ocean Pollution Crisis",
+        "subtitle": "Protecting Our Seas for Future Generations"
+      },
+      "order": 1
+    },
+    {
+      "type": "content",
+      "content": {
+        "headline": "The Scale of the Problem",
+        "bullets": [
+          "8 million tons of plastic enter oceans annually",
+          "Over 700 marine species are affected",
+          "By 2050, there could be more plastic than fish",
+          "Ocean acidification threatens ecosystems",
+          "Microplastics found in 90% of seabirds"
+        ]
+      },
+      "order": 2
+    },
+    {
+      "type": "image",
+      "content": {
+        "attribution": "Photo: WWF / Ocean Conservation",
+        "caption": "Marine life affected by pollution"
+      },
+      "order": 3
+    },
+    {
+      "type": "closing",
+      "content": {
+        "message": "Act Now for Our Oceans",
+        "subtitle": "Every Action Counts"
+      },
+      "order": 4
+    }
+  ],
+  "metadata": {
+    "author": "WWF Presentation Generator",
+    "company": "World Wildlife Fund",
+    "totalSlides": 4
+  }
+}
