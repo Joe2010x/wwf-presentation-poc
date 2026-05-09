@@ -3,6 +3,7 @@ import path from "path";
 import fs from "fs/promises";
 import { addTitleSlide, addContentSlide, addImageSlide, addClosingSlide, } from "./slide-generator.js";
 import { createSlidePlan, configToSlidePlanItems, } from "./slide-plan-manager.js";
+import { processSlidesWithUnsplash, } from "./unsplash-helper.js";
 /**
  * Parse command-line arguments into a PresentationConfig
  */
@@ -58,7 +59,20 @@ async function createPresentationFromConfig(config) {
         console.log("📋 Creating slide plan...");
         const slidePlanItems = configToSlidePlanItems(config);
         const slidePlan = await createSlidePlan(config.title, slidePlanItems, config.subtitle, "WWF Presentation Generator", "World Wildlife Fund");
-        // Step 2: Create the presentation
+        // Step 2: Process slides with Unsplash (convert to SlideWithImage format)
+        console.log("🔍 Processing slides for Unsplash images...");
+        const slidesWithImage = config.slides.map(slide => ({
+            type: slide.type,
+            data: slide.data
+        }));
+        // Process slides to fetch Unsplash images where needed
+        const processedSlides = await processSlidesWithUnsplash(slidesWithImage);
+        // Convert back to SlideConfig format
+        const processedConfigs = processedSlides.map(slide => ({
+            type: slide.type,
+            data: slide.data
+        }));
+        // Step 3: Create the presentation
         const pptx = new pptxgen();
         // Set presentation properties
         pptx.title = config.title;
@@ -66,8 +80,8 @@ async function createPresentationFromConfig(config) {
         pptx.company = "World Wildlife Fund";
         pptx.subject = config.title;
         // Process each slide
-        for (let i = 0; i < config.slides.length; i++) {
-            const slideConfig = config.slides[i];
+        for (let i = 0; i < processedConfigs.length; i++) {
+            const slideConfig = processedConfigs[i];
             console.log(`📝 Adding slide ${i + 1}: ${slideConfig.type}`);
             switch (slideConfig.type) {
                 case "title":

@@ -22,6 +22,16 @@ export interface Fonts {
   caption: string;
 }
 
+export interface LogoInfo {
+  path: string;
+  smallPath: string;
+  mediumPath: string;
+  epsPath: string;
+  altText: string;
+  clearSpace: string;
+  minWidth: string;
+}
+
 export interface LogoUsage {
   minClearSpace: string;
   minWidth: string;
@@ -44,6 +54,7 @@ export interface BrandGuidelines {
   lastUpdated: string;
   colors: BrandColors;
   fonts: Fonts;
+  logo?: LogoInfo;
   logoUsage: LogoUsage;
   slideTemplates: SlideTemplates;
 }

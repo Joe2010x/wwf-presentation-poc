@@ -1,4 +1,5 @@
 import { BrandGuidelines, Image, Partner, Symbol, SlidePlan, ValidationResult, PresentationResult } from './types';
+import { UnsplashImage, UnsplashSearchResult } from '../services/unsplash.service.js';
 /**
  * MCP Tool: get_brand_guidelines
  * Loads and returns the WWF brand guidelines.
@@ -47,4 +48,51 @@ export declare function generate_presentation(slide_plan: SlidePlan): Promise<Pr
  * @returns ValidationResult with pass/fail status and any issues found
  */
 export declare function validate_presentation(slide_plan: SlidePlan): Promise<ValidationResult>;
+/**
+ * MCP Tool: search_unsplash_images
+ * Searches for images on Unsplash by keyword.
+ * @param query - Search term to find relevant images
+ * @param per_page - Number of results per page (default: 10, max: 30)
+ * @param page - Page number for pagination (default: 1)
+ * @param orientation - Image orientation: 'landscape', 'portrait', or 'squarish' (optional)
+ * @returns UnsplashSearchResult with matching images and pagination info
+ */
+export declare function search_unsplash_images(query: string, per_page?: number, page?: number, orientation?: 'landscape' | 'portrait' | 'squarish'): Promise<UnsplashSearchResult>;
+/**
+ * MCP Tool: get_unsplash_photo
+ * Retrieves a specific photo from Unsplash by ID.
+ * @param unsplash_id - The Unsplash photo ID (e.g., "abc123")
+ * @returns UnsplashImage object with full metadata
+ */
+export declare function get_unsplash_photo(unsplash_id: string): Promise<UnsplashImage>;
+/**
+ * MCP Tool: get_unsplash_random_photo
+ * Gets a random photo from Unsplash, optionally filtered by search criteria.
+ * @param query - Optional search term to filter random selection
+ * @param featured - Whether to only return featured photos (default: false)
+ * @returns UnsplashImage object with random photo metadata
+ */
+export declare function get_unsplash_random_photo(query?: string, featured?: boolean): Promise<UnsplashImage>;
+/**
+ * MCP Tool: get_unsplash_download_url
+ * Gets the download URL for a specific Unsplash photo.
+ * @param unsplash_id - The Unsplash photo ID
+ * @returns Download URL string
+ */
+export declare function get_unsplash_download_url(unsplash_id: string): Promise<string>;
+/**
+ * MCP Tool: get_unsplash_liked_photos
+ * Gets photos liked by a specific Unsplash user.
+ * @param username - Unsplash username
+ * @param per_page - Number of results per page (default: 10)
+ * @param page - Page number (default: 1)
+ * @returns Array of UnsplashImage objects
+ */
+export declare function get_unsplash_liked_photos(username: string, per_page?: number, page?: number): Promise<UnsplashImage[]>;
+/**
+ * MCP Tool: is_unsplash_configured
+ * Checks if the Unsplash API is properly configured.
+ * @returns Boolean indicating if Unsplash service is available
+ */
+export declare function is_unsplash_configured(): Promise<boolean>;
 //# sourceMappingURL=tools.d.ts.map

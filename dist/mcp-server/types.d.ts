@@ -43,13 +43,29 @@ export interface Image {
     license: string;
     resolution: string;
     path: string;
+    source?: 'local' | 'unsplash' | string;
+}
+export interface ImageSource {
+    name: string;
+    description: string;
+    enabled: boolean;
+    requiresAuth?: boolean;
+    attribution?: string;
+}
+export interface ExternalSourceInfo {
+    description: string;
+    tools: string[];
+    attributionTemplate: string;
+    licenseInfo: string;
 }
 export interface ImageRepository {
     version: string;
     lastUpdated: string;
+    sources?: Record<string, ImageSource>;
     images: Image[];
     categories: string[];
     totalImages: number;
+    externalSources?: Record<string, ExternalSourceInfo>;
 }
 export interface Partner {
     id: string;

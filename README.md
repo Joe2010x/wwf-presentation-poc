@@ -5,7 +5,9 @@ A TypeScript proof of concept for generating WWF-style PowerPoint presentations 
 ## What It Does
 
 - Generates WWF-style presentation slide plans and PPTX files
-- Uses mock brand guidelines, image metadata, partner logos, and policy guidance
+- Uses brand guidelines, WWF logo, image metadata, partner logos, and policy guidance
+- Automatically fetches high-quality images from Unsplash (when configured)
+- Embeds the official WWF logo on title and closing slides
 - Saves generated files locally under `output/`
 - Provides a web server for creating, listing, downloading, regenerating, and deleting slide plans
 - Includes MCP-style tool functions for brand lookup, image lookup, partner lookup, validation, and presentation generation
@@ -130,6 +132,8 @@ wwf-presentation-poc/
 
 The project includes tool functions in `src/mcp-server/tools.ts`:
 
+### Core Tools
+
 | Tool | Description |
 | --- | --- |
 | `get_brand_guidelines()` | Load mock WWF brand guidelines |
@@ -139,6 +143,51 @@ The project includes tool functions in `src/mcp-server/tools.ts`:
 | `get_partner_logo(partner_name)` | Get partner logo metadata |
 | `generate_presentation(slide_plan)` | Generate a mock 5-slide presentation JSON |
 | `validate_presentation(slide_plan)` | Validate a slide plan against guidelines |
+
+### Unsplash Integration Tools
+
+The project includes full integration with the Unsplash API for accessing high-quality stock photos:
+
+| Tool | Description |
+| --- | --- |
+| `search_unsplash_images(query, per_page, page, orientation)` | Search for images on Unsplash by keyword |
+| `get_unsplash_photo(unsplash_id)` | Retrieve a specific photo from Unsplash by ID |
+| `get_unsplash_random_photo(query, featured)` | Get a random photo, optionally filtered by search criteria |
+| `get_unsplash_download_url(unsplash_id)` | Get the download URL for a specific photo |
+| `get_unsplash_liked_photos(username, per_page, page)` | Get photos liked by a specific Unsplash user |
+| `is_unsplash_configured()` | Check if the Unsplash API is properly configured |
+
+### Automatic Image Embedding in Presentations
+
+When generating presentations, you can automatically fetch images from Unsplash by adding a `searchQuery` field to your image slides:
+
+```json
+{
+  "type": "image",
+  "data": {
+    "caption": "Swedish Wildlife",
+    "searchQuery": "wildlife Sweden moose deer",
+    "attribution": "Will be auto-filled from Unsplash"
+  }
+}
+```
+
+Or use `useRandomImage` to get a random image with optional keywords:
+
+```json
+{
+  "type": "image", 
+  "data": {
+    "caption": "Nature Scene",
+    "useRandomImage": true,
+    "searchQuery": "forest nature"
+  }
+}
+```
+
+For detailed setup and usage instructions, see the [Unsplash Integration Guide](docs/UNSPLASH_INTEGRATION.md).
+
+**Note:** To use Unsplash tools, you need to configure the `UNSPLASH_ACCESS_KEY` environment variable in your `.env` file.
 
 ## Development Hygiene
 

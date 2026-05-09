@@ -1,4 +1,6 @@
 import pptxgen from "pptxgenjs";
+import path from "path";
+import fs from "fs/promises";
 import { loadBrandGuidelines, BrandGuidelines } from "./brand-loader.js";
 
 // Type alias for pptxgenjs presentation instance
@@ -16,6 +18,33 @@ async function getBrandGuidelines(): Promise<BrandGuidelines> {
     cachedBrandGuidelines = await loadBrandGuidelines();
   }
   return cachedBrandGuidelines;
+}
+
+function mimeTypeFromPath(filePath: string): string {
+  const ext = path.extname(filePath).toLowerCase();
+
+  if (ext === ".png") return "image/png";
+  if (ext === ".gif") return "image/gif";
+  if (ext === ".webp") return "image/webp";
+  return "image/jpeg";
+}
+
+async function imageSourceToData(source: string): Promise<string> {
+  if (/^https?:\/\//i.test(source)) {
+    const response = await fetch(source);
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch image: ${response.status} ${response.statusText}`);
+    }
+
+    const contentType = response.headers.get("content-type")?.split(";")[0] || "image/jpeg";
+    const buffer = Buffer.from(await response.arrayBuffer());
+    return `${contentType};base64,${buffer.toString("base64")}`;
+  }
+
+  const absolutePath = path.isAbsolute(source) ? source : path.resolve(process.cwd(), source);
+  const buffer = await fs.readFile(absolutePath);
+  return `${mimeTypeFromPath(absolutePath)};base64,${buffer.toString("base64")}`;
 }
 
 /**
@@ -42,6 +71,8 @@ export interface ImageSlideData {
   imageUrl?: string;
   attribution: string;
   caption?: string;
+  searchQuery?: string;    // Keyword for Unsplash search (optional)
+  useRandomImage?: boolean; // Use random image with optional keywords (optional)
 }
 
 /**
@@ -65,15 +96,40 @@ export async function addTitleSlide(
   // Set background color
   slide.background = { color: brand.slideTemplates.titleSlide.background };
 
-  // Add logo placeholder (top-left as per brand guidelines)
-  slide.addShape(pptx.ShapeType.rect, {
-    x: 0.5,
-    y: 0.5,
-    w: 1.5,
-    h: 0.75,
-    fill: { color: brand.colors.primary },
-    rectRadius: 0.1,
-  });
+  // Add WWF Logo (top-left as per brand guidelines)
+  if (brand.logo?.path) {
+    try {
+      const logoData = await imageSourceToData(brand.logo.mediumPath || brand.logo.smallPath || brand.logo.path);
+      slide.addImage({
+        data: logoData,
+        x: 0.5,
+        y: 0.3,
+        w: 1.0,
+        h: 1.125,
+      });
+    } catch (error) {
+      console.warn('⚠️ Could not load WWF logo, using placeholder');
+      // Fallback to placeholder if logo not found
+      slide.addShape(pptx.ShapeType.rect, {
+        x: 0.5,
+        y: 0.3,
+        w: 1.0,
+        h: 1.125,
+        fill: { color: brand.colors.primary },
+        rectRadius: 0.1,
+      });
+    }
+  } else {
+    // Fallback to placeholder if no logo path configured
+    slide.addShape(pptx.ShapeType.rect, {
+      x: 0.5,
+      y: 0.3,
+      w: 1.0,
+      h: 1.125,
+      fill: { color: brand.colors.primary },
+      rectRadius: 0.1,
+    });
+  }
 
   // Add title text
   slide.addText(slideData.title, {
@@ -192,13 +248,37 @@ export async function addImageSlide(
 
   // Add image (use placeholder if no image provided)
   if (slideData.imagePath || slideData.imageUrl) {
-    slide.addImage({
-      path: slideData.imagePath || slideData.imageUrl,
-      x: 1,
-      y: 0.5,
-      w: 8,
-      h: 4.5,
-    });
+    try {
+      const imageData = await imageSourceToData(slideData.imagePath || slideData.imageUrl || "");
+      slide.addImage({
+        data: imageData,
+        x: 1,
+        y: 0.5,
+        w: 8,
+        h: 4.5,
+      });
+    } catch (error) {
+      console.warn(`Could not load slide image, using placeholder: ${error instanceof Error ? error.message : error}`);
+      slide.addShape(pptx.ShapeType.rect, {
+        x: 1,
+        y: 0.5,
+        w: 8,
+        h: 4.5,
+        fill: { color: "#333333" },
+        line: { color: brand.colors.accent, width: 2 },
+      });
+
+      slide.addText("[Image Placeholder]", {
+        x: 1,
+        y: 2.5,
+        w: 8,
+        h: 0.5,
+        fontSize: 20,
+        fontFace: brand.fonts.body,
+        color: "#999999",
+        align: "center",
+      });
+    }
   } else {
     // Add placeholder rectangle for image
     slide.addShape(pptx.ShapeType.rect, {
@@ -274,15 +354,40 @@ export async function addClosingSlide(
   // Set background color
   slide.background = { color: brand.slideTemplates.titleSlide.background };
 
-  // Add logo placeholder (top-left as per brand guidelines)
-  slide.addShape(pptx.ShapeType.rect, {
-    x: 0.5,
-    y: 0.5,
-    w: 1.5,
-    h: 0.75,
-    fill: { color: brand.colors.primary },
-    rectRadius: 0.1,
-  });
+  // Add WWF Logo (top-left as per brand guidelines)
+  if (brand.logo?.path) {
+    try {
+      const logoData = await imageSourceToData(brand.logo.mediumPath || brand.logo.smallPath || brand.logo.path);
+      slide.addImage({
+        data: logoData,
+        x: 0.5,
+        y: 0.3,
+        w: 1.0,
+        h: 1.125,
+      });
+    } catch (error) {
+      console.warn('⚠️ Could not load WWF logo, using placeholder');
+      // Fallback to placeholder if logo not found
+      slide.addShape(pptx.ShapeType.rect, {
+        x: 0.5,
+        y: 0.3,
+        w: 1.0,
+        h: 1.125,
+        fill: { color: brand.colors.primary },
+        rectRadius: 0.1,
+      });
+    }
+  } else {
+    // Fallback to placeholder if no logo path configured
+    slide.addShape(pptx.ShapeType.rect, {
+      x: 0.5,
+      y: 0.3,
+      w: 1.0,
+      h: 1.125,
+      fill: { color: brand.colors.primary },
+      rectRadius: 0.1,
+    });
+  }
 
   // Add main message
   slide.addText(slideData.message, {

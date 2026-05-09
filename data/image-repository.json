@@ -1,6 +1,20 @@
 {
-  "version": "1.0.0",
-  "lastUpdated": "2026-05-05",
+  "version": "2.0.0",
+  "lastUpdated": "2026-05-09",
+  "sources": {
+    "local": {
+      "name": "WWF Local Repository",
+      "description": "Internal WWF image repository",
+      "enabled": true
+    },
+    "unsplash": {
+      "name": "Unsplash",
+      "description": "High-quality stock photos from Unsplash",
+      "enabled": true,
+      "requiresAuth": true,
+      "attribution": "Required - Photo by [Photographer] on Unsplash"
+    }
+  },
   "images": [
     {
       "id": "img_001",
@@ -11,7 +25,8 @@
       "photographer": "John Smith",
       "license": "WWF Internal Use",
       "resolution": "1920x1080",
-      "path": "assets/images/panda_bamboo.jpg"
+      "path": "assets/images/panda_bamboo.jpg",
+      "source": "local"
     },
     {
       "id": "img_002",
@@ -22,7 +37,8 @@
       "photographer": "Maria Garcia",
       "license": "WWF Internal Use",
       "resolution": "1920x1080",
-      "path": "assets/images/tiger_forest.jpg"
+      "path": "assets/images/tiger_forest.jpg",
+      "source": "local"
     },
     {
       "id": "img_003",
@@ -33,7 +49,8 @@
       "photographer": "David Chen",
       "license": "WWF Internal Use",
       "resolution": "1920x1080",
-      "path": "assets/images/ocean_plastic.jpg"
+      "path": "assets/images/ocean_plastic.jpg",
+      "source": "local"
     },
     {
       "id": "img_004",
@@ -44,7 +61,8 @@
       "photographer": "Sarah Johnson",
       "license": "WWF Internal Use",
       "resolution": "1920x1080",
-      "path": "assets/images/rainforest_canopy.jpg"
+      "path": "assets/images/rainforest_canopy.jpg",
+      "source": "local"
     },
     {
       "id": "img_005",
@@ -55,9 +73,24 @@
       "photographer": "Michael Brown",
       "license": "WWF Internal Use",
       "resolution": "1920x1080",
-      "path": "assets/images/polar_bear_ice.jpg"
+      "path": "assets/images/polar_bear_ice.jpg",
+      "source": "local"
     }
   ],
   "categories": ["wildlife", "environment", "conservation", "climate"],
-  "totalImages": 5
+  "totalImages": 5,
+  "externalSources": {
+    "unsplash": {
+      "description": "Use the Unsplash API tools to search and retrieve images",
+      "tools": [
+        "search_unsplash_images",
+        "get_unsplash_photo",
+        "get_unsplash_random_photo",
+        "get_unsplash_download_url",
+        "get_unsplash_liked_photos"
+      ],
+      "attributionTemplate": "Photo by {photographer} on Unsplash",
+      "licenseInfo": "Unsplash License - Free to use for commercial and non-commercial purposes"
+    }
+  }
 }

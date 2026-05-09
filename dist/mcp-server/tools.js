@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { unsplashService } from '../services/unsplash.service.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 // Mock symbols data (since assets/symbols is empty)
@@ -266,5 +267,114 @@ export async function validate_presentation(slide_plan) {
             warnings: [],
         };
     }
+}
+/**
+ * MCP Tool: search_unsplash_images
+ * Searches for images on Unsplash by keyword.
+ * @param query - Search term to find relevant images
+ * @param per_page - Number of results per page (default: 10, max: 30)
+ * @param page - Page number for pagination (default: 1)
+ * @param orientation - Image orientation: 'landscape', 'portrait', or 'squarish' (optional)
+ * @returns UnsplashSearchResult with matching images and pagination info
+ */
+export async function search_unsplash_images(query, per_page = 10, page = 1, orientation) {
+    if (!unsplashService.isConfigured()) {
+        throw new Error('Unsplash API is not configured. Please set UNSPLASH_ACCESS_KEY environment variable.');
+    }
+    try {
+        const result = await unsplashService.searchImages({
+            query,
+            perPage: Math.min(per_page, 30),
+            page,
+            orientation
+        });
+        return result;
+    }
+    catch (error) {
+        throw new Error(`Failed to search Unsplash images: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+}
+/**
+ * MCP Tool: get_unsplash_photo
+ * Retrieves a specific photo from Unsplash by ID.
+ * @param unsplash_id - The Unsplash photo ID (e.g., "abc123")
+ * @returns UnsplashImage object with full metadata
+ */
+export async function get_unsplash_photo(unsplash_id) {
+    if (!unsplashService.isConfigured()) {
+        throw new Error('Unsplash API is not configured. Please set UNSPLASH_ACCESS_KEY environment variable.');
+    }
+    try {
+        const photo = await unsplashService.getPhoto(unsplash_id);
+        return photo;
+    }
+    catch (error) {
+        throw new Error(`Failed to get Unsplash photo: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+}
+/**
+ * MCP Tool: get_unsplash_random_photo
+ * Gets a random photo from Unsplash, optionally filtered by search criteria.
+ * @param query - Optional search term to filter random selection
+ * @param featured - Whether to only return featured photos (default: false)
+ * @returns UnsplashImage object with random photo metadata
+ */
+export async function get_unsplash_random_photo(query, featured = false) {
+    if (!unsplashService.isConfigured()) {
+        throw new Error('Unsplash API is not configured. Please set UNSPLASH_ACCESS_KEY environment variable.');
+    }
+    try {
+        const photo = await unsplashService.getRandomPhoto(featured, query);
+        return photo;
+    }
+    catch (error) {
+        throw new Error(`Failed to get random Unsplash photo: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+}
+/**
+ * MCP Tool: get_unsplash_download_url
+ * Gets the download URL for a specific Unsplash photo.
+ * @param unsplash_id - The Unsplash photo ID
+ * @returns Download URL string
+ */
+export async function get_unsplash_download_url(unsplash_id) {
+    if (!unsplashService.isConfigured()) {
+        throw new Error('Unsplash API is not configured. Please set UNSPLASH_ACCESS_KEY environment variable.');
+    }
+    try {
+        const downloadUrl = await unsplashService.getDownloadUrl(unsplash_id);
+        return downloadUrl;
+    }
+    catch (error) {
+        throw new Error(`Failed to get Unsplash download URL: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+}
+/**
+ * MCP Tool: get_unsplash_liked_photos
+ * Gets photos liked by a specific Unsplash user.
+ * @param username - Unsplash username
+ * @param per_page - Number of results per page (default: 10)
+ * @param page - Page number (default: 1)
+ * @returns Array of UnsplashImage objects
+ */
+export async function get_unsplash_liked_photos(username, per_page = 10, page = 1) {
+    if (!unsplashService.isConfigured()) {
+        throw new Error('Unsplash API is not configured. Please set UNSPLASH_ACCESS_KEY environment variable.');
+    }
+    try {
+        const photos = await unsplashService.getLikedPhotos(username, per_page, page);
+        return photos;
+    }
+    catch (error) {
+        throw new Error(`Failed to get liked photos: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+}
+/**
+ * MCP Tool: is_unsplash_configured
+ * Checks if the Unsplash API is properly configured.
+ * @returns Boolean indicating if Unsplash service is available
+ */
+export async function is_unsplash_configured() {
+    return unsplashService.isConfigured();
 }
 //# sourceMappingURL=tools.js.map

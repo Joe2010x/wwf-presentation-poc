@@ -16,9 +16,9 @@ export interface LLMPresentationStructure {
 /**
  * Generate presentation structure from natural language prompt
  */
-export declare function generatePresentationFromPrompt(prompt: string): Promise<LLMPresentationStructure>;
+export declare function generatePresentationFromPrompt(prompt: string, temperature?: number): Promise<LLMPresentationStructure>;
 /**
  * Generate a presentation with retry logic
  */
-export declare function generatePresentationWithRetry(prompt: string, maxRetries?: number): Promise<LLMPresentationStructure>;
+export declare function generatePresentationWithRetry(prompt: string, temperature?: number, maxRetries?: number): Promise<LLMPresentationStructure>;
 //# sourceMappingURL=openrouter-client.d.ts.map

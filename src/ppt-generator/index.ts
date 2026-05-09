@@ -16,6 +16,10 @@ import {
   configToSlidePlanItems,
   SlidePlan,
 } from "./slide-plan-manager.js";
+import {
+  processSlidesWithUnsplash,
+  SlideWithImage,
+} from "./unsplash-helper.js";
 
 /**
  * Slide configuration interface for CLI-driven presentations
@@ -105,7 +109,23 @@ async function createPresentationFromConfig(
       "World Wildlife Fund"
     );
 
-    // Step 2: Create the presentation
+    // Step 2: Process slides with Unsplash (convert to SlideWithImage format)
+    console.log("🔍 Processing slides for Unsplash images...");
+    const slidesWithImage: SlideWithImage[] = config.slides.map(slide => ({
+      type: slide.type,
+      data: slide.data as any
+    }));
+    
+    // Process slides to fetch Unsplash images where needed
+    const processedSlides = await processSlidesWithUnsplash(slidesWithImage);
+    
+    // Convert back to SlideConfig format
+    const processedConfigs = processedSlides.map(slide => ({
+      type: slide.type,
+      data: slide.data as TitleSlideData | ContentSlideData | ImageSlideData | ClosingSlideData
+    }));
+
+    // Step 3: Create the presentation
     const pptx: any = new pptxgen();
 
     // Set presentation properties
@@ -115,8 +135,8 @@ async function createPresentationFromConfig(
     pptx.subject = config.title;
 
     // Process each slide
-    for (let i = 0; i < config.slides.length; i++) {
-      const slideConfig = config.slides[i];
+    for (let i = 0; i < processedConfigs.length; i++) {
+      const slideConfig = processedConfigs[i];
       console.log(`📝 Adding slide ${i + 1}: ${slideConfig.type}`);
 
       switch (slideConfig.type) {

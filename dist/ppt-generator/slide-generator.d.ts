@@ -22,6 +22,8 @@ export interface ImageSlideData {
     imageUrl?: string;
     attribution: string;
     caption?: string;
+    searchQuery?: string;
+    useRandomImage?: boolean;
 }
 /**
  * Interface for closing slide data

@@ -101,8 +101,13 @@ app.post("/api/generate-from-prompt", async (req, res) => {
       return res.status(400).json({ error: "Prompt is required" });
     }
 
+    const rawTemperature = Number(req.body?.temperature);
+    const temperature = Number.isFinite(rawTemperature)
+      ? Math.min(Math.max(rawTemperature, 0), 2)
+      : 0.9;
+
     const llmPresentation: LLMPresentationStructure =
-      await generatePresentationWithRetry(prompt);
+      await generatePresentationWithRetry(prompt, temperature);
 
     const timestamp = Date.now();
     const filename = `presentation-${timestamp}.pptx`;
@@ -287,8 +292,9 @@ app.get("/api/templates", (req, res) => {
           {
             type: "image" as const,
             data: {
-              attribution: "Photo: WWF / Ocean Conservation",
+              attribution: "Will be auto-filled from Unsplash",
               caption: "Marine life affected by pollution",
+              searchQuery: "ocean pollution marine life plastic",
             },
           },
           {
@@ -383,8 +389,9 @@ app.get("/api/templates", (req, res) => {
           {
             type: "image" as const,
             data: {
-              attribution: "Photo: WWF Conservation",
+              attribution: "Will be auto-filled from Unsplash",
               caption: "Endangered species need our protection",
+              searchQuery: "endangered species wildlife conservation",
             },
           },
           {

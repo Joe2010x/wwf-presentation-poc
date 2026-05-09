@@ -103,6 +103,23 @@
             resize: vertical;
         }
 
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--accent);
+        }
+
+        .range-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .range-row output {
+            min-width: 3ch;
+            font-weight: bold;
+            text-align: right;
+        }
+
         button {
             background: var(--primary);
             color: var(--secondary);
@@ -309,6 +326,13 @@
                         <label for="llm-prompt">Generate with AI Prompt</label>
                         <textarea id="llm-prompt" placeholder="Example: Create a 6-slide WWF-style presentation about ocean plastic pollution for high school students"></textarea>
                     </div>
+                    <div class="form-group">
+                        <label for="llm-temperature">Temperature</label>
+                        <div class="range-row">
+                            <input type="range" id="llm-temperature" min="0" max="2" step="0.1" value="0.9">
+                            <output id="llm-temperature-value" for="llm-temperature">0.9</output>
+                        </div>
+                    </div>
                     <button type="button" class="accent" id="generate-ai-btn">Generate from Prompt</button>
                 </div>
                 
@@ -388,6 +412,12 @@
             
             document.getElementById('presentation-form').addEventListener('submit', handleSubmit);
             document.getElementById('generate-ai-btn').addEventListener('click', handlePromptGenerate);
+
+            const temperatureInput = document.getElementById('llm-temperature');
+            const temperatureValue = document.getElementById('llm-temperature-value');
+            temperatureInput.addEventListener('input', () => {
+                temperatureValue.value = Number(temperatureInput.value).toFixed(1);
+            });
         });
 
         function escapeHtml(value) {
@@ -523,6 +553,7 @@
 
         async function handlePromptGenerate() {
             const prompt = document.getElementById('llm-prompt').value.trim();
+            const temperature = Number(document.getElementById('llm-temperature').value);
 
             if (!prompt) {
                 showStatus('Please enter a prompt for the AI generator.', 'error');
@@ -541,7 +572,7 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ prompt })
+                    body: JSON.stringify({ prompt, temperature })
                 });
 
                 const result = await response.json();

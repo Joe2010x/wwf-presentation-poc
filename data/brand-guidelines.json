@@ -1,6 +1,6 @@
 {
-  "version": "1.0.0",
-  "lastUpdated": "2026-05-05",
+  "version": "2.0.0",
+  "lastUpdated": "2026-05-09",
   "colors": {
     "primary": "#000000",
     "secondary": "#FFFFFF",
@@ -13,6 +13,15 @@
     "subheading": "Arial Bold",
     "body": "Arial",
     "caption": "Arial Narrow"
+  },
+  "logo": {
+    "path": "data/WWF_Box_Logo/JPG/WWF_Logo_Large_RGB_72dpi.jpg",
+    "smallPath": "data/WWF_Box_Logo/JPG/WWF_Logo_Small_RGB_72dpi.jpg",
+    "mediumPath": "data/WWF_Box_Logo/JPG/WWF_Logo_Medium_RGB_72dpi.jpg",
+    "epsPath": "data/WWF_Box_Logo/EPS/WWF_Logo_CMYK.eps",
+    "altText": "WWF Logo",
+    "clearSpace": "20px",
+    "minWidth": "100px"
   },
   "logoUsage": {
     "minClearSpace": "20px",

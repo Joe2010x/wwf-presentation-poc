@@ -30,7 +30,8 @@ You must return a JSON object with the following structure:
         
         // For image slides:
         "attribution": "Image credit",
-        "caption": "Optional caption"
+        "caption": "Optional caption",
+        "searchQuery": "specific Unsplash search phrase for the image"
         
         // For closing slides:
         "message": "Closing message",
@@ -48,12 +49,13 @@ Rules:
 5. Content slides should have 3-5 bullet points
 6. Keep content concise and professional
 7. Match the tone and topic requested by the user
+8. Image slides must include a short, concrete searchQuery suitable for finding a relevant Unsplash photo
 
 Return ONLY the JSON object, no additional text or explanation.`;
 /**
  * Generate presentation structure from natural language prompt
  */
-export async function generatePresentationFromPrompt(prompt) {
+export async function generatePresentationFromPrompt(prompt, temperature = 0.9) {
     if (!OPENROUTER_API_KEY) {
         throw new Error("OPENROUTER_API_KEY is not configured in .env file");
     }
@@ -76,7 +78,7 @@ export async function generatePresentationFromPrompt(prompt) {
                 content: `Create a presentation about: ${prompt}`,
             },
         ],
-        temperature: 0.3,
+        temperature,
         max_tokens: 2000,
     };
     try {
@@ -139,14 +141,14 @@ export async function generatePresentationFromPrompt(prompt) {
 /**
  * Generate a presentation with retry logic
  */
-export async function generatePresentationWithRetry(prompt, maxRetries = 2) {
+export async function generatePresentationWithRetry(prompt, temperature = 0.9, maxRetries = 2) {
     let lastError = null;
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
         try {
             if (attempt > 0) {
                 console.log(`🔄 Retry attempt ${attempt}...`);
             }
-            return await generatePresentationFromPrompt(prompt);
+            return await generatePresentationFromPrompt(prompt, temperature);
         }
         catch (error) {
             lastError = error instanceof Error ? error : new Error(String(error));
