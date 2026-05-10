@@ -1,0 +1,116 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-05-09",
+  "totalArticles": 7,
+  "categories": [
+    "ocean-conservation",
+    "wildlife-protection",
+    "climate-change",
+    "forest-conservation"
+  ],
+  "articles": [
+    {
+      "id": "art_001",
+      "filename": "art_001_ocean-plastic.md",
+      "title": "Ocean Plastic Crisis Worsens: New Study Reveals Alarming Trends",
+      "author": "Dr. Jane Smith",
+      "publishedDate": "2026-05-01",
+      "source": "Marine Conservation Journal",
+      "sourceUrl": "https://marineconservation.example.com/ocean-plastic-crisis",
+      "category": "ocean-conservation",
+      "tags": ["ocean", "plastic", "pollution", "marine-life", "microplastics"],
+      "readingTime": 6,
+      "wordCount": 1500
+    },
+    {
+      "id": "art_002",
+      "filename": "art_002_tiger-conservation.md",
+      "title": "Tiger Populations Rebound: Conservation Efforts Show Promise",
+      "author": "Dr. Rajesh Kumar",
+      "publishedDate": "2026-04-28",
+      "source": "Wildlife Biology Review",
+      "sourceUrl": "https://wildlifebiology.example.com/tiger-rebound",
+      "category": "wildlife-protection",
+      "tags": ["tiger", "endangered-species", "conservation", "india", "habitat"],
+      "readingTime": 5,
+      "wordCount": 1200
+    },
+    {
+      "id": "art_003",
+      "filename": "art_003_arctic-ice.md",
+      "title": "Arctic Ice Melting Faster Than Predicted: Climate Tipping Point Nears",
+      "author": "Dr. Sarah Johnson",
+      "publishedDate": "2026-05-05",
+      "source": "Climate Science Today",
+      "sourceUrl": "https://climatescience.example.com/arctic-ice-melting",
+      "category": "climate-change",
+      "tags": ["arctic", "ice-melting", "climate-change", "polar-bears", "sea-level"],
+      "readingTime": 7,
+      "wordCount": 1800
+    },
+    {
+      "id": "art_004",
+      "filename": "art_004_amazon-rainforest.md",
+      "title": "Amazon Rainforest Deforestation Hits Record Low After Conservation Push",
+      "author": "Maria Santos",
+      "publishedDate": "2026-04-22",
+      "source": "Environmental Policy Quarterly",
+      "sourceUrl": "https://envpolicy.example.com/amazon-deforestation-decline",
+      "category": "forest-conservation",
+      "tags": ["amazon", "rainforest", "deforestation", "brazil", "biodiversity"],
+      "readingTime": 5,
+      "wordCount": 1300
+    },
+    {
+      "id": "art_005",
+      "filename": "art_005_coral-reefs.md",
+      "title": "Coral Reef Restoration: New Techniques Offer Hope for Dying Ecosystems",
+      "author": "Dr. Michael Chen",
+      "publishedDate": "2026-05-03",
+      "source": "Ocean Ecology Journal",
+      "sourceUrl": "https://oceanecology.example.com/coral-restoration",
+      "category": "ocean-conservation",
+      "tags": ["coral-reefs", "restoration", "ocean", "biodiversity", "climate"],
+      "readingTime": 6,
+      "wordCount": 1400
+    },
+    {
+      "id": "art_006",
+      "filename": "art_006_panda-conservation.md",
+      "title": "Giant Panda Conservation: From Endangered to Vulnerable",
+      "author": "Dr. Li Wei",
+      "publishedDate": "2026-04-15",
+      "source": "Conservation Success Stories",
+      "sourceUrl": "https://conservationstories.example.com/panda-success",
+      "category": "wildlife-protection",
+      "tags": ["panda", "endangered-species", "china", "conservation", "bamboo"],
+      "readingTime": 4,
+      "wordCount": 1000
+    },
+    {
+      "id": "art_007",
+      "filename": "art_007_baltic-sea-nutrient-loads.md",
+      "title": "Disaster Avoided: Baltic Sea Nutrient Load Reductions Prevented Worse Eutrophication",
+      "author": "Eva Ehrnsten, Christoph Humborg, Erik Gustafsson, Bo G. Gustafsson",
+      "publishedDate": "2025-06-01",
+      "source": "Limnology and Oceanography Letters",
+      "sourceUrl": "https://doi.org/10.1002/lol2.10443",
+      "category": "ocean-conservation",
+      "tags": [
+        "baltic-sea",
+        "eutrophication",
+        "nutrient-loads",
+        "nitrogen",
+        "phosphorus",
+        "oxygen-depletion",
+        "hypoxia",
+        "algal-blooms",
+        "marine-policy",
+        "helcom",
+        "water-quality"
+      ],
+      "readingTime": 8,
+      "wordCount": 2500
+    }
+  ]
+}

@@ -13,6 +13,7 @@ export interface TitleSlideData {
 export interface ContentSlideData {
     headline: string;
     bullets: string[];
+    source?: string;
 }
 /**
  * Interface for image slide data

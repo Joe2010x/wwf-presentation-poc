@@ -50,6 +50,7 @@ Rules:
 6. Keep content concise and professional
 7. Match the tone and topic requested by the user
 8. Image slides must include a short, concrete searchQuery suitable for finding a relevant Unsplash photo
+9. If the user asks for a specific number of slides or pages, create that many slides whenever possible
 
 Return ONLY the JSON object, no additional text or explanation.`;
 /**
@@ -79,7 +80,7 @@ export async function generatePresentationFromPrompt(prompt, temperature = 0.9) 
             },
         ],
         temperature,
-        max_tokens: 2000,
+        max_tokens: 5000,
     };
     try {
         console.log(`🤖 Sending request to OpenRouter API...`);

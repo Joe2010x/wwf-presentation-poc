@@ -19,6 +19,11 @@ import {
   generatePresentationWithRetry,
   LLMPresentationStructure,
 } from "../llm/openrouter-client.js";
+import {
+  search_articles,
+  summarize_article,
+  get_related_articles,
+} from "../mcp-server/tools.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -42,20 +47,76 @@ const slidePlansDir = path.join(outputDir, "slide-plans");
 fs.mkdir(pptxDir, { recursive: true }).catch(console.error);
 fs.mkdir(slidePlansDir, { recursive: true }).catch(console.error);
 
+type ArticleSummaryForSlides = {
+  title: string;
+  summary: string;
+  source: string;
+  author: string;
+  keyPoints: string[];
+};
+
+function insertArticleSummarySlides(
+  slides: SlideConfig[],
+  articleSummaries: ArticleSummaryForSlides[]
+): SlideConfig[] {
+  if (articleSummaries.length === 0) {
+    return slides;
+  }
+
+  const summarySlides: SlideConfig[] = articleSummaries.slice(0, 2).map(summary => ({
+    type: "content",
+    data: {
+      headline: `Article Summary: ${summary.title}`,
+      bullets: summary.keyPoints.slice(0, 4), // Show up to 4 key points
+      source: summary.author && summary.source
+        ? `Source: ${summary.author}, ${summary.source}`
+        : summary.author
+        ? `Source: ${summary.author}`
+        : summary.source
+        ? `Source: ${summary.source}`
+        : undefined
+    }
+  }));
+
+  let closingIndex = -1;
+  for (let i = slides.length - 1; i >= 0; i--) {
+    if (slides[i].type === "closing") {
+      closingIndex = i;
+      break;
+    }
+  }
+
+  if (closingIndex >= 0) {
+    return [
+      ...slides.slice(0, closingIndex),
+      ...summarySlides,
+      ...slides.slice(closingIndex)
+    ];
+  }
+
+  return [...slides, ...summarySlides];
+}
+
 /**
  * POST /api/generate
  * Generate a presentation from JSON configuration
  */
 app.post("/api/generate", async (req, res) => {
+  console.log(`\n📥 POST /api/generate - Request received`);
+  console.log(`   Title: ${req.body?.title || '(missing)'}`);
+  console.log(`   Slides: ${req.body?.slides?.length || 0}`);
+
   try {
     const config: PresentationConfig = req.body;
 
     // Validate required fields
     if (!config.title) {
+      console.log(`   ❌ Validation failed: Missing title`);
       return res.status(400).json({ error: "Presentation title is required" });
     }
 
     if (!config.slides || config.slides.length === 0) {
+      console.log(`   ❌ Validation failed: No slides provided`);
       return res.status(400).json({ error: "At least one slide is required" });
     }
 
@@ -70,7 +131,9 @@ app.post("/api/generate", async (req, res) => {
     };
 
     // Generate the presentation
+    console.log(`   🚀 Starting presentation generation...`);
     const result = await createPresentationFromConfig(modifiedConfig);
+    console.log(`   ✅ Generation complete`);
 
     // Return success response
     res.json({
@@ -80,8 +143,9 @@ app.post("/api/generate", async (req, res) => {
       slidePlanId: result.slidePlan.id,
       message: "Presentation generated successfully!",
     });
+    console.log(`   📤 Response sent to client`);
   } catch (error) {
-    console.error("Error generating presentation:", error);
+    console.error(`   ❌ Error generating presentation:`, error);
     res.status(500).json({
       error: "Failed to generate presentation",
       message: error instanceof Error ? error.message : "Unknown error",
@@ -92,12 +156,20 @@ app.post("/api/generate", async (req, res) => {
 /**
  * POST /api/generate-from-prompt
  * Generate a presentation by first asking the LLM for slide structure
+ * Automatically includes relevant article summaries when available
  */
 app.post("/api/generate-from-prompt", async (req, res) => {
+  console.log(`\n📥 POST /api/generate-from-prompt - Request received`);
+  console.log(`   Prompt: ${req.body?.prompt?.substring(0, 100) || '(missing)'}...`);
+  console.log(`   Temperature: ${req.body?.temperature || 0.9}`);
+  console.log(`   Include Articles: ${req.body?.includeArticles !== false}`);
+
   try {
     const prompt = typeof req.body?.prompt === "string" ? req.body.prompt.trim() : "";
+    const includeArticles = req.body?.includeArticles === true; // Default to false
 
     if (!prompt) {
+      console.log(`   ❌ Validation failed: Missing prompt`);
       return res.status(400).json({ error: "Prompt is required" });
     }
 
@@ -106,8 +178,59 @@ app.post("/api/generate-from-prompt", async (req, res) => {
       ? Math.min(Math.max(rawTemperature, 0), 2)
       : 0.9;
 
+    // Step 1: Search for relevant articles if requested
+    let articleSummaries: ArticleSummaryForSlides[] = [];
+    
+    if (includeArticles) {
+      try {
+        console.log(`   📚 Searching for relevant articles...`);
+        const relevantArticles = await search_articles(prompt, 3);
+        
+        if (relevantArticles.length > 0) {
+          console.log(`   📚 Found ${relevantArticles.length} relevant articles`);
+          
+          for (const article of relevantArticles) {
+            try {
+              const summary = await summarize_article(article.id, { 
+                style: 'bullet', 
+                maxLength: 100 
+              });
+              articleSummaries.push({
+                title: summary.title,
+                summary: summary.keyPoints.join('\n'),
+                source: summary.sourceUrl,
+                author: summary.author,
+                keyPoints: summary.keyPoints
+              });
+              console.log(`   ✅ Summarized: ${article.title}`);
+            } catch (err) {
+              console.warn(`   ⚠️ Could not summarize article ${article.id}: ${err instanceof Error ? err.message : err}`);
+            }
+          }
+        } else {
+          console.log(`   📚 No relevant articles found for this topic`);
+        }
+      } catch (err) {
+        console.warn(`   ⚠️ Article search failed: ${err instanceof Error ? err.message : err}`);
+      }
+    }
+
+    // Step 2: Generate presentation structure from LLM (with article context if available)
+    let llmPrompt = prompt;
+    if (articleSummaries.length > 0) {
+      const articleContext = articleSummaries
+        .map((s, i) => `Article ${i + 1}: ${s.title}\nKey points: ${s.keyPoints.join('; ')}`)
+        .join('\n\n');
+      
+      llmPrompt = `${prompt}\n\nRelevant Articles for Reference:\n${articleContext}\n\nPlease incorporate key information from these articles into the presentation slides where relevant, include article summary content, and include proper attribution.`;
+      console.log(`   📊 Enhanced prompt with ${articleSummaries.length} article summaries`);
+    }
+
+    console.log(`   🤖 Sending request to OpenRouter API...`);
     const llmPresentation: LLMPresentationStructure =
-      await generatePresentationWithRetry(prompt, temperature);
+      await generatePresentationWithRetry(llmPrompt, temperature);
+    console.log(`   ✅ Received LLM response: ${llmPresentation.title}`);
+    console.log(`   📊 Generated ${llmPresentation.slides.length} slides from prompt`);
 
     const timestamp = Date.now();
     const filename = `presentation-${timestamp}.pptx`;
@@ -115,22 +238,31 @@ app.post("/api/generate-from-prompt", async (req, res) => {
     const config: PresentationConfig = {
       title: llmPresentation.title,
       subtitle: llmPresentation.subtitle,
-      slides: llmPresentation.slides as SlideConfig[],
+      slides: insertArticleSummarySlides(llmPresentation.slides as SlideConfig[], articleSummaries),
       output: filename,
     };
 
+    // Generate the presentation
+    console.log(`   🚀 Starting presentation generation...`);
     const result = await createPresentationFromConfig(config);
+    console.log(`   ✅ Generation complete`);
 
     res.json({
       success: true,
       filename,
       downloadUrl: `/api/download/${filename}`,
       slidePlanId: result.slidePlan.id,
-      presentation: llmPresentation,
-      message: "Presentation generated from prompt!",
+      presentation: {
+        ...llmPresentation,
+        slides: config.slides,
+      },
+      articlesIncluded: articleSummaries.length,
+      articles: articleSummaries,
+      message: `Presentation generated from prompt${articleSummaries.length > 0 ? ` with ${articleSummaries.length} article summaries` : '!'}`,
     });
+    console.log(`   📤 Response sent to client`);
   } catch (error) {
-    console.error("Error generating presentation from prompt:", error);
+    console.error(`   ❌ Error generating presentation from prompt:`, error);
     res.status(500).json({
       error: "Failed to generate presentation from prompt",
       message: error instanceof Error ? error.message : "Unknown error",

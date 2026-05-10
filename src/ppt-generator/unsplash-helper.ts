@@ -54,6 +54,12 @@ async function searchUnsplashWithRetry(
 ): Promise<PresentationImage | null> {
   for (let attempt = 1; attempt <= MAX_SEARCH_ATTEMPTS; attempt++) {
     try {
+      if (attempt > 1) {
+        console.log(`🔄 Retry attempt ${attempt}/${MAX_SEARCH_ATTEMPTS} for query: "${query}"`);
+      }
+
+      console.log(`🔍 Searching Unsplash for: "${query}" (orientation: ${orientation})`);
+
       const searchResults = await unsplashService.searchImages({
         query,
         perPage: 1,
@@ -61,13 +67,19 @@ async function searchUnsplashWithRetry(
       });
 
       if (searchResults.results.length === 0) {
-        console.warn(`No Unsplash images found for "${query}"`);
+        console.warn(`⚠️ No Unsplash images found for "${query}"`);
         return null;
       }
 
       const photo = searchResults.results[0];
+      console.log(`🖼️ Found image: "${photo.description || photo.id}" by ${photo.photographer}`);
+
       await unsplashService.trackDownload(photo.links.download);
       const resolution = photo.resolution.split('x');
+      const width = parseInt(resolution[0]) || 1920;
+      const height = parseInt(resolution[1]) || 1080;
+
+      console.log(`✅ Image selected: ${photo.unsplashId} (${width}x${height})`);
 
       return {
         id: photo.unsplashId,
@@ -75,12 +87,12 @@ async function searchUnsplashWithRetry(
         photographer: photo.photographer,
         attribution: `Photo by ${photo.photographer} on Unsplash`,
         description: photo.description || photo.tags?.[0] || '',
-        width: parseInt(resolution[0]) || 1920,
-        height: parseInt(resolution[1]) || 1080
+        width: width,
+        height: height
       };
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      console.warn(`Unsplash search failed for "${query}" (attempt ${attempt}/${MAX_SEARCH_ATTEMPTS}): ${message}`);
+      console.warn(`❌ Unsplash search failed for "${query}" (attempt ${attempt}/${MAX_SEARCH_ATTEMPTS}): ${message}`);
 
       if (attempt < MAX_SEARCH_ATTEMPTS) {
         await delay(500 * attempt);
@@ -88,6 +100,7 @@ async function searchUnsplashWithRetry(
     }
   }
 
+  console.error(`❌ All ${MAX_SEARCH_ATTEMPTS} attempts failed for query: "${query}"`);
   return null;
 }
 

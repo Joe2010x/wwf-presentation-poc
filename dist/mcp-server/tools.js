@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { unsplashService } from '../services/unsplash.service.js';
+import { articleSummarizer } from '../services/article-summarizer.service.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 // Mock symbols data (since assets/symbols is empty)
@@ -376,5 +377,336 @@ export async function get_unsplash_liked_photos(username, per_page = 10, page = 
  */
 export async function is_unsplash_configured() {
     return unsplashService.isConfigured();
+}
+// ==========================================
+// Article Repository MCP Tools
+// ==========================================
+/**
+ * MCP Tool: search_articles
+ * Searches the article repository by title, tags, or category.
+ * @param query - Search term to match against title, tags, or category
+ * @param limit - Maximum number of results to return (default: 10)
+ * @returns Array of matching Article objects
+ */
+export async function search_articles(query, limit = 10) {
+    try {
+        const filePath = path.resolve(__dirname, '../../data/Articles/articles-repository.json');
+        const fileContents = await fs.readFile(filePath, 'utf-8');
+        const repository = JSON.parse(fileContents);
+        const stopWords = new Set([
+            'about', 'article', 'articles', 'and', 'animal', 'animals',
+            'create', 'deck', 'for', 'from', 'include', 'make', 'of', 'page',
+            'pages', 'picture', 'pictures', 'possible', 'presentation', 'slide',
+            'slides', 'summaries', 'summary', 'the', 'when', 'with'
+        ]);
+        const terms = query
+            .toLowerCase()
+            .replace(/[^a-z0-9\s-]/g, ' ')
+            .split(/[\s-]+/)
+            .map(term => term.trim())
+            .filter(term => term.length >= 3 && !stopWords.has(term));
+        const uniqueTerms = Array.from(new Set(terms));
+        const queryLower = query.toLowerCase();
+        const scoredArticles = repository.articles
+            .map(article => {
+            const searchable = [
+                article.title,
+                article.category,
+                article.author,
+                article.source,
+                ...article.tags
+            ].join(' ').toLowerCase().replace(/-/g, ' ');
+            let score = 0;
+            if (searchable.includes(queryLower)) {
+                score += 20;
+            }
+            for (const term of uniqueTerms) {
+                if (article.tags.some(tag => tag.toLowerCase().replace(/-/g, ' ').includes(term))) {
+                    score += 6;
+                }
+                if (article.title.toLowerCase().includes(term)) {
+                    score += 5;
+                }
+                if (article.category.toLowerCase().replace(/-/g, ' ').includes(term)) {
+                    score += 4;
+                }
+                if (article.author.toLowerCase().includes(term) || article.source.toLowerCase().includes(term)) {
+                    score += 1;
+                }
+            }
+            return { article, score };
+        })
+            .filter(item => item.score > 0)
+            .sort((a, b) => b.score - a.score);
+        return scoredArticles.slice(0, limit).map(item => item.article);
+    }
+    catch (error) {
+        if (error instanceof SyntaxError) {
+            throw new Error(`Failed to parse articles-repository.json: ${error.message}`);
+        }
+        throw new Error(`Failed to search articles: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+}
+/**
+ * MCP Tool: get_article_metadata
+ * Retrieves metadata for a specific article by ID.
+ * @param article_id - The unique identifier of the article (e.g., "art_001")
+ * @returns Article object with full metadata
+ */
+export async function get_article_metadata(article_id) {
+    try {
+        const filePath = path.resolve(__dirname, '../../data/Articles/articles-repository.json');
+        const fileContents = await fs.readFile(filePath, 'utf-8');
+        const repository = JSON.parse(fileContents);
+        const article = repository.articles.find((art) => art.id === article_id);
+        if (!article) {
+            throw new Error(`Article with ID "${article_id}" not found in repository.`);
+        }
+        return article;
+    }
+    catch (error) {
+        if (error instanceof SyntaxError) {
+            throw new Error(`Failed to parse articles-repository.json: ${error.message}`);
+        }
+        throw new Error(`Failed to get article metadata: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+}
+/**
+ * MCP Tool: get_article_content
+ * Retrieves the full content of an article from its markdown file.
+ * @param article_id - The unique identifier of the article
+ * @returns ArticleContent object with article metadata and full text
+ */
+export async function get_article_content(article_id) {
+    try {
+        // First get the article metadata
+        const article = await get_article_metadata(article_id);
+        // Then read the markdown file
+        const filePath = path.resolve(__dirname, `../../data/Articles/articles/${article.filename}`);
+        const content = await fs.readFile(filePath, 'utf-8');
+        return {
+            article,
+            content
+        };
+    }
+    catch (error) {
+        if (error instanceof Error && error.message.includes('not found')) {
+            throw error;
+        }
+        throw new Error(`Failed to get article content: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+}
+/**
+ * MCP Tool: list_articles_by_category
+ * Lists all articles in a specific category.
+ * @param category - The category to filter by
+ * @returns Array of Article objects in the specified category
+ */
+export async function list_articles_by_category(category) {
+    try {
+        const filePath = path.resolve(__dirname, '../../data/Articles/articles-repository.json');
+        const fileContents = await fs.readFile(filePath, 'utf-8');
+        const repository = JSON.parse(fileContents);
+        const matchingArticles = repository.articles.filter((article) => article.category.toLowerCase() === category.toLowerCase());
+        if (matchingArticles.length === 0) {
+            throw new Error(`No articles found in category "${category}".`);
+        }
+        return matchingArticles;
+    }
+    catch (error) {
+        if (error instanceof SyntaxError) {
+            throw new Error(`Failed to parse articles-repository.json: ${error.message}`);
+        }
+        throw new Error(`Failed to list articles by category: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+}
+/**
+ * MCP Tool: get_article_categories
+ * Returns all available article categories.
+ * @returns Array of category strings
+ */
+export async function get_article_categories() {
+    try {
+        const filePath = path.resolve(__dirname, '../../data/Articles/articles-repository.json');
+        const fileContents = await fs.readFile(filePath, 'utf-8');
+        const repository = JSON.parse(fileContents);
+        return repository.categories;
+    }
+    catch (error) {
+        if (error instanceof SyntaxError) {
+            throw new Error(`Failed to parse articles-repository.json: ${error.message}`);
+        }
+        throw new Error(`Failed to get article categories: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+}
+/**
+ * MCP Tool: summarize_article
+ * Uses LLM to summarize an article and extract key points.
+ * @param article_id - The unique identifier of the article
+ * @param options - Summarization options (style, maxLength, etc.)
+ * @returns ArticleSummaryResult with summary and key points
+ */
+export async function summarize_article(article_id, options = {}) {
+    try {
+        console.log(`📝 MCP: Summarizing article ${article_id}...`);
+        // Get the article content
+        const articleContent = await get_article_content(article_id);
+        // Check if summarizer is configured
+        if (!articleSummarizer.isConfigured()) {
+            console.warn('⚠️ OpenRouter API not configured. Providing basic summary.');
+            // Return a basic summary using the first paragraph
+            const firstParagraph = articleContent.content.split('\n\n')[0] || '';
+            return {
+                articleId: article_id,
+                title: articleContent.article.title,
+                summary: firstParagraph.substring(0, 300) + '...',
+                keyPoints: [firstParagraph.substring(0, 100)],
+                sourceUrl: articleContent.article.sourceUrl,
+                author: articleContent.article.author,
+                publishedDate: articleContent.article.publishedDate
+            };
+        }
+        // Use LLM to summarize
+        const result = await articleSummarizer.summarizeArticle(article_id, articleContent.content, articleContent.article.title, options);
+        // Add metadata from the article
+        result.sourceUrl = articleContent.article.sourceUrl;
+        result.author = articleContent.article.author;
+        result.publishedDate = articleContent.article.publishedDate;
+        return result;
+    }
+    catch (error) {
+        throw new Error(`Failed to summarize article: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+}
+/**
+ * MCP Tool: get_related_articles
+ * Finds articles related to a given article using LLM analysis or tag matching.
+ * @param article_id - The source article ID
+ * @param count - Number of related articles to return (default: 3)
+ * @returns Array of related Article objects
+ */
+export async function get_related_articles(article_id, count = 3) {
+    try {
+        console.log(`🔍 MCP: Finding related articles for ${article_id}...`);
+        // Get the source article content
+        const sourceContent = await get_article_content(article_id);
+        // Get all other articles as candidates
+        const filePath = path.resolve(__dirname, '../../data/Articles/articles-repository.json');
+        const fileContents = await fs.readFile(filePath, 'utf-8');
+        const repository = JSON.parse(fileContents);
+        const candidateArticles = repository.articles
+            .filter(art => art.id !== article_id)
+            .map(art => ({
+            id: art.id,
+            title: art.title,
+            content: '', // We'll load content if needed
+            tags: art.tags
+        }));
+        // Use LLM to find related articles if configured, otherwise use tag matching
+        let relatedIds;
+        if (articleSummarizer.isConfigured()) {
+            // Load content for candidates (just first 200 chars for analysis)
+            for (const candidate of candidateArticles) {
+                try {
+                    const content = await fs.readFile(path.resolve(__dirname, `../../data/Articles/articles/${candidate.id}.md`), 'utf-8');
+                    candidate.content = content.substring(0, 200);
+                }
+                catch {
+                    candidate.content = candidate.title;
+                }
+            }
+            relatedIds = await articleSummarizer.findRelatedArticles({
+                title: sourceContent.article.title,
+                content: sourceContent.content.substring(0, 500),
+                tags: sourceContent.article.tags
+            }, candidateArticles, count);
+        }
+        else {
+            // Fallback to tag-based matching
+            relatedIds = candidateArticles
+                .map(candidate => {
+                const overlap = candidate.tags.filter(tag => sourceContent.article.tags.some(st => st.toLowerCase() === tag.toLowerCase())).length;
+                return { id: candidate.id, score: overlap };
+            })
+                .sort((a, b) => b.score - a.score)
+                .slice(0, count)
+                .map(item => item.id);
+        }
+        // Return the full article objects for the related IDs
+        return relatedIds
+            .map(id => repository.articles.find(art => art.id === id))
+            .filter((art) => art !== undefined);
+    }
+    catch (error) {
+        throw new Error(`Failed to find related articles: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+}
+/**
+ * MCP Tool: create_article_presentation
+ * Creates a presentation slide plan from selected articles.
+ * @param article_ids - Array of article IDs to include
+ * @param presentation_title - Title for the presentation
+ * @returns SlidePlan for the article-based presentation
+ */
+export async function create_article_presentation(article_ids, presentation_title) {
+    try {
+        console.log(`📊 MCP: Creating presentation from ${article_ids.length} articles...`);
+        const slides = [];
+        // Title slide
+        slides.push({
+            slideNumber: 1,
+            slideType: 'title',
+            title: presentation_title,
+            content: 'Article Summary Presentation'
+        });
+        // Article summary slides
+        for (let i = 0; i < Math.min(article_ids.length, 3); i++) {
+            const articleId = article_ids[i];
+            const summary = await summarize_article(articleId, { style: 'bullet', maxLength: 100 });
+            // Format source attribution
+            const sourceAttribution = summary.author && summary.sourceUrl
+                ? `Source: ${summary.author}, ${summary.sourceUrl}`
+                : summary.sourceUrl
+                    ? `Source: ${summary.sourceUrl}`
+                    : summary.author
+                        ? `Source: ${summary.author}`
+                        : undefined;
+            slides.push({
+                slideNumber: i + 2,
+                slideType: 'content',
+                title: summary.title,
+                content: summary.keyPoints.join('\n'),
+                source: sourceAttribution,
+                photoCredits: sourceAttribution ? [sourceAttribution] : undefined
+            });
+        }
+        // Related articles slide
+        if (article_ids.length > 0) {
+            const relatedArticles = await get_related_articles(article_ids[0], 3);
+            const relatedLinks = relatedArticles
+                .map(art => `• ${art.title} - ${art.sourceUrl}`)
+                .join('\n');
+            slides.push({
+                slideNumber: Math.min(article_ids.length, 3) + 2,
+                slideType: 'content',
+                title: 'Related Articles',
+                content: relatedLinks
+            });
+        }
+        // Closing slide
+        slides.push({
+            slideNumber: 5,
+            slideType: 'closing',
+            title: 'Thank You',
+            content: 'For more information, visit the source articles.'
+        });
+        return {
+            title: presentation_title,
+            slides: slides.slice(0, 5) // Ensure exactly 5 slides
+        };
+    }
+    catch (error) {
+        throw new Error(`Failed to create article presentation: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
 }
 //# sourceMappingURL=tools.js.map

@@ -120,6 +120,17 @@
             text-align: right;
         }
 
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-row label {
+            margin: 0;
+            font-weight: normal;
+        }
+
         button {
             background: var(--primary);
             color: var(--secondary);
@@ -332,6 +343,10 @@
                             <input type="range" id="llm-temperature" min="0" max="2" step="0.1" value="0.9">
                             <output id="llm-temperature-value" for="llm-temperature">0.9</output>
                         </div>
+                    </div>
+                    <div class="form-group checkbox-row">
+                        <input type="checkbox" id="include-articles">
+                        <label for="include-articles">Include article summaries</label>
                     </div>
                     <button type="button" class="accent" id="generate-ai-btn">Generate from Prompt</button>
                 </div>
@@ -554,6 +569,7 @@
         async function handlePromptGenerate() {
             const prompt = document.getElementById('llm-prompt').value.trim();
             const temperature = Number(document.getElementById('llm-temperature').value);
+            const includeArticles = document.getElementById('include-articles').checked;
 
             if (!prompt) {
                 showStatus('Please enter a prompt for the AI generator.', 'error');
@@ -572,7 +588,7 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ prompt, temperature })
+                    body: JSON.stringify({ prompt, temperature, includeArticles })
                 });
 
                 const result = await response.json();

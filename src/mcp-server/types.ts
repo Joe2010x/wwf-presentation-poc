@@ -138,3 +138,60 @@ export interface PresentationResult {
   message: string;
   slideCount: number;
 }
+
+// ==========================================
+// Article Repository Types
+// ==========================================
+
+export interface Article {
+  id: string;
+  filename: string;
+  title: string;
+  author: string;
+  publishedDate: string;
+  source: string;
+  sourceUrl: string;
+  category: string;
+  tags: string[];
+  readingTime: number;
+  wordCount: number;
+}
+
+export interface ArticleContent {
+  article: Article;
+  content: string;
+}
+
+export interface ArticleSummary {
+  article: Article;
+  summary: string;
+  keyPoints: string[];
+  targetAudience?: string;
+}
+
+export interface ArticleRepository {
+  version: string;
+  lastUpdated: string;
+  totalArticles: number;
+  categories: string[];
+  articles: Article[];
+}
+
+export interface ArticleSearchOptions {
+  query?: string;
+  category?: string;
+  tags?: string[];
+  limit?: number;
+}
+
+export interface RelatedArticlesRequest {
+  articleId: string;
+  count?: number;
+  useLLM?: boolean;
+}
+
+export interface SummarizeRequest {
+  articleId: string;
+  maxLength?: number;
+  style?: 'bullet' | 'paragraph' | 'executive';
+}

@@ -1,5 +1,6 @@
-import { BrandGuidelines, Image, Partner, Symbol, SlidePlan, ValidationResult, PresentationResult } from './types';
+import { BrandGuidelines, Image, Partner, Symbol, SlidePlan, ValidationResult, PresentationResult, Article, ArticleContent } from './types.js';
 import { UnsplashImage, UnsplashSearchResult } from '../services/unsplash.service.js';
+import { ArticleSummaryResult, SummarizationOptions } from '../services/article-summarizer.service.js';
 /**
  * MCP Tool: get_brand_guidelines
  * Loads and returns the WWF brand guidelines.
@@ -95,4 +96,63 @@ export declare function get_unsplash_liked_photos(username: string, per_page?: n
  * @returns Boolean indicating if Unsplash service is available
  */
 export declare function is_unsplash_configured(): Promise<boolean>;
+/**
+ * MCP Tool: search_articles
+ * Searches the article repository by title, tags, or category.
+ * @param query - Search term to match against title, tags, or category
+ * @param limit - Maximum number of results to return (default: 10)
+ * @returns Array of matching Article objects
+ */
+export declare function search_articles(query: string, limit?: number): Promise<Article[]>;
+/**
+ * MCP Tool: get_article_metadata
+ * Retrieves metadata for a specific article by ID.
+ * @param article_id - The unique identifier of the article (e.g., "art_001")
+ * @returns Article object with full metadata
+ */
+export declare function get_article_metadata(article_id: string): Promise<Article>;
+/**
+ * MCP Tool: get_article_content
+ * Retrieves the full content of an article from its markdown file.
+ * @param article_id - The unique identifier of the article
+ * @returns ArticleContent object with article metadata and full text
+ */
+export declare function get_article_content(article_id: string): Promise<ArticleContent>;
+/**
+ * MCP Tool: list_articles_by_category
+ * Lists all articles in a specific category.
+ * @param category - The category to filter by
+ * @returns Array of Article objects in the specified category
+ */
+export declare function list_articles_by_category(category: string): Promise<Article[]>;
+/**
+ * MCP Tool: get_article_categories
+ * Returns all available article categories.
+ * @returns Array of category strings
+ */
+export declare function get_article_categories(): Promise<string[]>;
+/**
+ * MCP Tool: summarize_article
+ * Uses LLM to summarize an article and extract key points.
+ * @param article_id - The unique identifier of the article
+ * @param options - Summarization options (style, maxLength, etc.)
+ * @returns ArticleSummaryResult with summary and key points
+ */
+export declare function summarize_article(article_id: string, options?: SummarizationOptions): Promise<ArticleSummaryResult>;
+/**
+ * MCP Tool: get_related_articles
+ * Finds articles related to a given article using LLM analysis or tag matching.
+ * @param article_id - The source article ID
+ * @param count - Number of related articles to return (default: 3)
+ * @returns Array of related Article objects
+ */
+export declare function get_related_articles(article_id: string, count?: number): Promise<Article[]>;
+/**
+ * MCP Tool: create_article_presentation
+ * Creates a presentation slide plan from selected articles.
+ * @param article_ids - Array of article IDs to include
+ * @param presentation_title - Title for the presentation
+ * @returns SlidePlan for the article-based presentation
+ */
+export declare function create_article_presentation(article_ids: string[], presentation_title: string): Promise<SlidePlan>;
 //# sourceMappingURL=tools.d.ts.map

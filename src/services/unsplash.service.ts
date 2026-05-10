@@ -135,6 +135,8 @@ class UnsplashService {
     } = options;
 
     try {
+      console.log(`📤 Sending search request to Unsplash API: "${query}" (page=${page}, perPage=${perPage})`);
+
       const response = await this.api.search.getPhotos({
         query,
         perPage: Math.min(perPage, 30), // Unsplash max is 30 per page
@@ -144,10 +146,13 @@ class UnsplashService {
       });
 
       if (response.type === 'error') {
+        console.error(`❌ Unsplash API error: ${response.errors[0] || 'Unknown error'}`);
         throw new Error(`Unsplash API Error: ${response.errors[0] || 'Unknown error'}`);
       }
 
       const results = response.response.results.map((photo: any) => this.mapPhotoToUnsplashImage(photo));
+
+      console.log(`📥 Received ${results.length} images from Unsplash (total: ${response.response.total})`);
 
       return {
         results,
@@ -155,6 +160,7 @@ class UnsplashService {
         totalPages: response.response.total_pages
       };
     } catch (error) {
+      console.error(`❌ Failed to search Unsplash: ${error instanceof Error ? error.message : 'Unknown error'}`);
       throw new Error(`Failed to search Unsplash images: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
@@ -168,16 +174,21 @@ class UnsplashService {
     }
 
     try {
+      console.log(`📤 Fetching photo from Unsplash: ${unsplashId}`);
+
       const response = await this.api.photos.get({
         photoId: unsplashId
       });
 
       if (response.type === 'error') {
+        console.error(`❌ Unsplash API error: ${response.errors[0] || 'Unknown error'}`);
         throw new Error(`Unsplash API Error: ${response.errors[0] || 'Unknown error'}`);
       }
 
+      console.log(`📥 Received photo: ${response.response.description || unsplashId}`);
       return this.mapPhotoToUnsplashImage(response.response);
     } catch (error) {
+      console.error(`❌ Failed to get Unsplash photo: ${error instanceof Error ? error.message : 'Unknown error'}`);
       throw new Error(`Failed to get Unsplash photo: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
@@ -191,6 +202,8 @@ class UnsplashService {
     }
 
     try {
+      console.log(`📤 Fetching random photo from Unsplash${query ? ` with query: "${query}"` : ''}`);
+
       const response = await this.api.photos.getRandom({
         featured,
         query,
@@ -198,11 +211,14 @@ class UnsplashService {
       });
 
       if (response.type === 'error') {
+        console.error(`❌ Unsplash API error: ${response.errors[0] || 'Unknown error'}`);
         throw new Error(`Unsplash API Error: ${response.errors[0] || 'Unknown error'}`);
       }
 
+      console.log(`📥 Received random photo: ${Array.isArray(response.response) ? response.response[0]?.description : response.response.description || response.response.id}`);
       return this.mapPhotoToUnsplashImage(response.response);
     } catch (error) {
+      console.error(`❌ Failed to get random Unsplash photo: ${error instanceof Error ? error.message : 'Unknown error'}`);
       throw new Error(`Failed to get random Unsplash photo: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
@@ -270,13 +286,20 @@ class UnsplashService {
     }
 
     try {
+      console.log(`📤 Tracking Unsplash download...`);
+
       const response = await this.api.photos.trackDownload({ downloadLocation });
 
       if (response.type === 'error') {
-        throw new Error(`Unsplash API Error: ${response.errors[0] || 'Unknown error'}`);
+        console.warn(`⚠️ Failed to track download: ${response.errors[0] || 'Unknown error'}`);
+        // Don't throw - tracking is not critical
+        return;
       }
+
+      console.log(`✅ Download tracked successfully`);
     } catch (error) {
-      throw new Error(`Failed to track Unsplash download: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.warn(`⚠️ Failed to track Unsplash download: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      // Don't throw - tracking is not critical
     }
   }
 

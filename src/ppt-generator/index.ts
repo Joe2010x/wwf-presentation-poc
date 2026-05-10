@@ -95,11 +95,13 @@ function parseArguments(args: string[]): PresentationConfig | null {
 async function createPresentationFromConfig(
   config: PresentationConfig
 ): Promise<{ slidePlan: SlidePlan; filename: string }> {
-  console.log(`🎬 Creating presentation: "${config.title}"...`);
+  console.log(`\n🎬 Creating presentation: "${config.title}"...`);
+  console.log(`   Subtitle: ${config.subtitle || '(none)'}`);
+  console.log(`   Slides: ${config.slides.length}`);
 
   try {
     // Step 1: Create and save slide plan
-    console.log("📋 Creating slide plan...");
+    console.log(`\n📋 Step 1/4: Creating slide plan...`);
     const slidePlanItems = configToSlidePlanItems(config);
     const slidePlan = await createSlidePlan(
       config.title,
@@ -108,9 +110,10 @@ async function createPresentationFromConfig(
       "WWF Presentation Generator",
       "World Wildlife Fund"
     );
+    console.log(`✅ Slide plan created with ID: ${slidePlan.id}`);
 
     // Step 2: Process slides with Unsplash (convert to SlideWithImage format)
-    console.log("🔍 Processing slides for Unsplash images...");
+    console.log(`\n🔍 Step 2/4: Processing slides for Unsplash images...`);
     const slidesWithImage: SlideWithImage[] = config.slides.map(slide => ({
       type: slide.type,
       data: slide.data as any
@@ -118,6 +121,7 @@ async function createPresentationFromConfig(
     
     // Process slides to fetch Unsplash images where needed
     const processedSlides = await processSlidesWithUnsplash(slidesWithImage);
+    console.log(`✅ Processed ${processedSlides.length} slides`);
     
     // Convert back to SlideConfig format
     const processedConfigs = processedSlides.map(slide => ({
@@ -126,7 +130,8 @@ async function createPresentationFromConfig(
     }));
 
     // Step 3: Create the presentation
-    const pptx: any = new pptxgen();
+    console.log(`\n📝 Step 3/4: Building presentation slides...`);
+    const pptx: any = new (pptxgen as any)();
 
     // Set presentation properties
     pptx.title = config.title;
@@ -137,7 +142,7 @@ async function createPresentationFromConfig(
     // Process each slide
     for (let i = 0; i < processedConfigs.length; i++) {
       const slideConfig = processedConfigs[i];
-      console.log(`📝 Adding slide ${i + 1}: ${slideConfig.type}`);
+      console.log(`   📝 Adding slide ${i + 1}/${processedConfigs.length}: ${slideConfig.type}`);
 
       switch (slideConfig.type) {
         case "title":
@@ -153,32 +158,36 @@ async function createPresentationFromConfig(
           await addClosingSlide(pptx, slideConfig.data as ClosingSlideData);
           break;
         default:
-          console.warn(`⚠️ Unknown slide type: ${slideConfig.type}`);
+          console.warn(`   ⚠️ Unknown slide type: ${slideConfig.type}`);
       }
     }
+    console.log(`✅ All slides added to presentation`);
 
     // Ensure output directories exist
     const outputDir = path.resolve(process.cwd(), "output");
     const pptxDir = path.join(outputDir, "pptx");
     await fs.mkdir(pptxDir, { recursive: true });
 
-    // Save the presentation to output/pptx/
+    // Step 4: Save the presentation
+    console.log(`\n💾 Step 4/4: Saving presentation...`);
     const filename = config.output || `presentation-${Date.now()}.pptx`;
     const outputPath = path.join(pptxDir, filename);
-    console.log(`💾 Saving presentation to: ${outputPath}`);
+    console.log(`   Output path: ${outputPath}`);
 
     // Generate the PPTX file and save it to the correct location
+    console.log(`   Generating PPTX file...`);
     const arrayBuffer = await (pptx as any).write("arraybuffer");
     const buffer = Buffer.from(arrayBuffer);
     await fs.writeFile(outputPath, buffer);
+    console.log(`   File size: ${(buffer.length / 1024).toFixed(1)} KB`);
 
-    console.log("✅ Presentation created successfully!");
-    console.log(`📄 File saved as: output/${filename}`);
+    console.log(`\n✅ Presentation created successfully!`);
+    console.log(`📄 File saved as: output/pptx/${filename}`);
     console.log(`📋 Slide plan saved as: output/slide-plans/${slidePlan.id}.json`);
 
     return { slidePlan, filename };
   } catch (error) {
-    console.error("❌ Error creating presentation:", error);
+    console.error(`\n❌ Error creating presentation:`, error);
     throw error;
   }
 }
@@ -190,7 +199,7 @@ async function createDemoPresentation(): Promise<void> {
   console.log("🎬 Creating WWF-style presentation demo...");
 
   try {
-    const pptx: any = new pptxgen();
+    const pptx: any = new (pptxgen as any)();
 
     // Set presentation properties
     pptx.title = "WWF Presentation POC";

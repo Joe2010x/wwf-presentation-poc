@@ -119,6 +119,21 @@ export async function addTitleSlide(pptx, slideData) {
 export async function addContentSlide(pptx, slideData) {
     const brand = await getBrandGuidelines();
     const slide = pptx.addSlide();
+    const isArticleSummary = slideData.headline?.startsWith("Article Summary:");
+    const sourceFromBullet = slideData.bullets.find(bullet => bullet.trim().toLowerCase().startsWith("source:"));
+    const sourceText = slideData.source || sourceFromBullet;
+    const bullets = isArticleSummary
+        ? slideData.bullets.filter(bullet => !bullet.trim().toLowerCase().startsWith("source:"))
+        : slideData.bullets;
+    const headlineFontSize = isArticleSummary
+        ? slideData.headline.length > 120
+            ? 12
+            : slideData.headline.length > 90
+                ? 14
+                : slideData.headline.length > 65
+                    ? 16
+                    : 20
+        : 24;
     // Set background color
     slide.background = { color: brand.slideTemplates.contentSlide.background };
     // Add header bar
@@ -132,30 +147,46 @@ export async function addContentSlide(pptx, slideData) {
     // Add headline in header
     slide.addText(slideData.headline, {
         x: 0.5,
-        y: 0.25,
+        y: isArticleSummary ? 0.12 : 0.25,
         w: 9,
-        h: 0.5,
-        fontSize: 28,
+        h: isArticleSummary ? 0.75 : 0.5,
+        fontSize: headlineFontSize,
         fontFace: brand.fonts.heading,
         color: brand.colors.secondary,
         bold: true,
+        breakLine: false,
+        fit: "shrink",
     });
-    // Add bullet points one by one
-    let yPos = 1.5;
-    const lineHeight = 0.7;
-    for (const bullet of slideData.bullets) {
+    // Add bullet points one by one (reduced font size)
+    let yPos = isArticleSummary ? 1.35 : 1.5;
+    const lineHeight = isArticleSummary ? 0.78 : 0.65;
+    for (const bullet of bullets) {
         slide.addText(bullet, {
             x: 0.5,
             y: yPos,
             w: 9,
-            h: 0.5,
-            fontSize: 18,
+            h: isArticleSummary ? 0.58 : 0.45,
+            fontSize: isArticleSummary ? 15 : 16,
             fontFace: brand.fonts.body,
             color: brand.colors.textPrimary,
             bullet: true,
-            lineSpacing: 30,
+            lineSpacing: 28,
         });
         yPos += lineHeight;
+    }
+    // Add source attribution in bottom right corner (if provided)
+    if (sourceText) {
+        slide.addText(sourceText, {
+            x: 4.5,
+            y: 5.75,
+            w: 4.5,
+            h: 0.35,
+            fontSize: 8,
+            fontFace: brand.fonts.caption,
+            color: brand.colors.textSecondary,
+            align: "right",
+            italic: true,
+        });
     }
     // Add footer with accent color
     slide.addShape(pptx.ShapeType.rect, {
